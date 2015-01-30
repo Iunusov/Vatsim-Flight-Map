@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vatsim Flight Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Vatsim aircrafts and ATC on google maps.">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="icon" href="favicon.ico"/>
+<link href="http://yandex.st/bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0; padding-top: 40px; }
+  #map_canvas { height: 100% }
+  .info{
+  font-size:small;
+height:200px;
+width: 200px;
+overflow-x:hidden;
+}
+</style>
+<link href="http://yandex.st/bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
+<style type="text/css">
+  .navbar-fixed-top {
+margin-bottom: 0px;
+}
+</style>
+</head>
+<body>
+ <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="/">Home</a></li>
+			  <li><a href="#" id="showTopAirports">Popular airports</a></li>
+            </ul>
+			 <div class="navbar-form pull-right">
+              <input id="search" class="span2" type="text" onkeydown="if(event.keyCode == 13) $('#cssearch').click();">
+              <input id="cssearch" type="button" class="btn" value="Search callsign">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div id="map_canvas" style="width:100%; height:100%">
+  </div>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA9zHzTYMK-qrIeDaC-DBdWab3UsN1UBFE&amp;sensor=true"></script>
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//yandex.st/bootstrap/2.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/js/app.js?build=1457"></script>
+  <div style="float:right"><!--LiveInternet counter--><script type="text/javascript">document.write("<a href='//www.liveinternet.ru/click' target=_blank><img src='//counter.yadro.ru/hit?t14.6;r" + escape(document.referrer) + ((typeof(screen)=="undefined")?"":";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?screen.colorDepth:screen.pixelDepth)) + ";u" + escape(document.URL) + ";" + Math.random() + "' border=0 width=88 height=31 alt='' title='LiveInternet: показано число просмотров за 24 часа, посетителей за 24 часа и за сегодня'><\/a>")</script><!--/LiveInternet-->
+</div>
+</body>
+</html>
