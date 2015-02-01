@@ -8,21 +8,18 @@ jQuery(function () {
 	var tmpMarkersArray = [];
 	var initLocation = new google.maps.LatLng(48.35719, 14.55371);
 	var defaultLocation = new google.maps.LatLng(initLocation.lat(), initLocation.lng());
-	if (('localStorage' in window) && window['localStorage'] != null)
+	var zoom = 3;
+	if (('localStorage' in window) && window['localStorage'] != null) {
 		if (localStorage.getItem('map_center_lat') && localStorage.getItem('map_center_lng')) {
 			defaultLocation = new google.maps.LatLng(localStorage.getItem('map_center_lat'), localStorage.getItem('map_center_lng'));
 		}
-	function initialize() {
-		if (defaultLocation.lat() == initLocation.lat() && defaultLocation.lng() == initLocation.lng()) {
-			if (navigator.geolocation) {
-				browserSupportFlag = true;
-				navigator.geolocation.getCurrentPosition(function (position) {
-					map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-				}, function () {});
-			};
+		if (localStorage.getItem('map_zoom')) {
+			zoom = parseInt(localStorage.getItem('map_zoom'));
 		}
+	}
+	function initialize() {
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
-				zoom : 4,
+				zoom : zoom,
 				center : defaultLocation,
 				mapTypeId : google.maps.MapTypeId.ROADMAP
 			});
@@ -33,11 +30,13 @@ jQuery(function () {
 			}
 			tmpMarkersArray = [];
 		});
-		if (('localStorage' in window) && window['localStorage'] != null)
-			google.maps.event.addListener(map, 'drag', function () {
+		window.onbeforeunload = function (e) {
+			if (('localStorage' in window) && window['localStorage'] != null) {
 				localStorage.setItem('map_center_lat', map.getCenter().lat());
 				localStorage.setItem('map_center_lng', map.getCenter().lng());
-			});
+				localStorage.setItem('map_zoom', map.zoom);
+			}
+		};
 		loopFunction();
 		setInterval(loopFunction, 60000);
 	};
@@ -82,7 +81,6 @@ jQuery(function () {
 	};
 	function makeBoxInfo(client) {
 		var title = "";
-		title += "<b>past flights:</b> <a target=\"_blank\"href=\"http://www.vataware.com/pilot.cfm?cid=" + client["cid"] + "\">vataware</a><br>";
 		for (var key in client) {
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude"]) == -1) {
 				if (key == "planned_route" || key == "planned_remarks") {
