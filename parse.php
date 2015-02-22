@@ -1,7 +1,16 @@
 <?php
-ini_set('display_startup_errors',1);
-ini_set('display_errors',1);
+function errHandle($errNo, $errStr, $errFile, $errLine) {
+    $msg = "$errStr in $errFile on line $errLine";
+    if ($errNo == E_NOTICE || $errNo == E_WARNING) {
+        throw new ErrorException($msg, $errNo);
+    } else {
+        echo $msg;
+    }
+}
+ini_set('display_startup_errors', 1);
+ini_set('display_errors', 1);
 error_reporting(-1);
+set_error_handler('errHandle');
 
 $arUrl = array(
     "http://www.pcflyer.net/DataFeed/vatsim-data.txt",
