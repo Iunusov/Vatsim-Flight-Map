@@ -1,4 +1,5 @@
 <?php
+if(!(php_sapi_name() === 'cli')) die("\nnot cli\n");
 function errHandle($errNo, $errStr, $errFile, $errLine) {
     $msg = "$errStr in $errFile on line $errLine";
     if ($errNo == E_NOTICE || $errNo == E_WARNING) {
@@ -11,6 +12,7 @@ ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
 set_error_handler('errHandle');
+ini_set('default_socket_timeout', 30); 
 
 $arUrl = array(
     "http://www.pcflyer.net/DataFeed/vatsim-data.txt",

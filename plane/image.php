@@ -1,4 +1,5 @@
 <?php
+die();
 header('Content-type: image/png');  
 $cached = 'cache/'.$_GET['r'].'.png';
 if(file_exists($cached)) die(file_get_contents($cached));
