@@ -19,7 +19,7 @@ preg_match("/!CLIENTS section -(.*):".PHP_EOL."; !PREFILE/", $data, $clients_tpl
 foreach($clients as $key => $item) {
   $clients[$key] = array_combine(explode(":",trim($clients_tpl[1])),explode(":",$item));
   foreach($clients[$key] as $k => $v){
-    if($k=="atis_message") $clients[$key][$k] = htmlentities($clients[$key][$k],ENT_IGNORE);
+    if($k=="atis_message") $clients[$key][$k] = htmlentities($clients[$key][$k]);
     if($v===""||in_array($k,array("time_logon","rating","protrevision","QNH_Mb","QNH_iHg","planned_destairport_lon","planned_destairport_lat","planned_depairport_lon","planned_depairport_lat","planned_minfuel","planned_minenroute","planned_actdeptime","planned_revision","server"))){
 	  unset($clients[$key][$k]);
 	}
