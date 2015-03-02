@@ -56,7 +56,7 @@ jQuery(function () {
 				if (!client.heading)
 					client.heading = 0;
 				if (client.clienttype == "PILOT") {
-					icon = "/plane/cache/" + (360 - client.heading + client.heading % 10) + ".png";
+					icon = "/img/planes/" + (360 - client.heading + client.heading % 10) + ".png";
 				}
 				if (client.clienttype == "ATC") {
 					icon = "/img/control.png";
