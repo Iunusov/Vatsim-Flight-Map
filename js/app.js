@@ -109,42 +109,42 @@ jQuery(function () {
 	function showTopAirports() {
 		var airports = {};
 		var airports_array = [];
-		$.getJSON("/clients.json?" + Math.random(), function (data) {
-			$.each(data, function (index, element) {
-				if (element["clienttype"] == "PILOT") {
-					if (typeof element["planned_destairport"] != "undefined") {
-						element["planned_destairport"] = element["planned_destairport"].toUpperCase();
-						if (typeof airports[element["planned_destairport"]] == "undefined")
-							airports[element["planned_destairport"]] = 1;
-						else {
-							airports[element["planned_destairport"]]++;
-						}
-					}
-					if (typeof element["planned_depairport"] != "undefined") {
-						element["planned_depairport"] = element["planned_depairport"].toUpperCase();
-						if (typeof airports[element["planned_depairport"]] == "undefined")
-							airports[element["planned_depairport"]] = 1;
-						else {
-							airports[element["planned_depairport"]]++;
-						}
+		$.each(clients, function (index, element) {
+			if (element["clienttype"] == "PILOT") {
+				if (typeof element["planned_destairport"] != "undefined") {
+					element["planned_destairport"] = element["planned_destairport"].toUpperCase();
+					if (typeof airports[element["planned_destairport"]] == "undefined")
+						airports[element["planned_destairport"]] = 1;
+					else {
+						airports[element["planned_destairport"]]++;
 					}
 				}
+				if (typeof element["planned_depairport"] != "undefined") {
+					element["planned_depairport"] = element["planned_depairport"].toUpperCase();
+					if (typeof airports[element["planned_depairport"]] == "undefined")
+						airports[element["planned_depairport"]] = 1;
+					else {
+						airports[element["planned_depairport"]]++;
+					}
+				}
+			}
+		});
+		$.each(airports, function (index, element) {
+			airports_array.push({
+				"name" : index,
+				"val" : airports[index]
 			});
-			$.each(airports, function (index, element) {
-				airports_array.push({
-					"name" : index,
-					"val" : airports[index]
-				});
-			});
-			airports_array.sort(function (a, b) {
-				return b.val - a.val
-			});
-			var s = "Top 10 airports:\n\n";
-			for (var i = 0; i < 10; i++) {
+		});
+		airports_array.sort(function (a, b) {
+			return b.val - a.val
+		});
+		var s = "Top 10 airports:\n\n";
+		for (var i = 0; i < 10; i++) {
+			if (i in airports_array) {
 				s += airports_array[i].name + " (" + airports_array[i].val + ")" + "\n";
 			}
-			alert(s);
-		});
+		}
+		alert(s);
 	}
 	initialize();
 	$("#showTopAirports").click(function () {
