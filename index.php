@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Vatsim Flight Map</title>
+<title>Vatsim Map Online</title>
 <meta name="description" content="Vatsim flights online on google map: aircrafts and ATC. Update time: every 5 min.">
 <link rel="shortcut icon" href="favicon.ico"/>
 <link rel="icon" href="favicon.ico"/>
@@ -20,14 +20,14 @@ body {
 	width:100% 
 }
 #menu{
-position: absolute; top: 0px; right: 115px; z-index: 50; margin-top: 5px
+position: absolute; top: 0px; right: 115px; z-index: 50; margin-top: 5px; margin-left: 33px;
 }
 
 </style>
 </head>
 <body>
 <div id="menu">
-<div style="margin-left: 33px;">
+<div>
 <input id="search" style="margin-bottom: 2px; width: 90px; " type="text" placeholder="Callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();">
 <div style="float:right; margin-left: 5px">
 <input id="cssearch" type="button" value="Search!"> 

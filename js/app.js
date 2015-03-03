@@ -1,9 +1,10 @@
-jQuery(function () {
-	var map;
+"use strict";
+jQuery(function ($) {
+	var map = null;
 	var markersArray = [];
 	var clients = [];
 	var infowindow = new google.maps.InfoWindow({
-			maxWidth : 200
+			maxWidth : 400
 		});
 	var tmpMarkersArray = [];
 	var initLocation = new google.maps.LatLng(48.35719, 14.55371);
@@ -25,10 +26,13 @@ jQuery(function () {
 			});
 		google.maps.event.addListener(infowindow, 'closeclick', function () {
 			infowindow.vs_cid = -1;
-			for (i in tmpMarkersArray) {
+			for (var i in tmpMarkersArray) {
 				tmpMarkersArray[i].setMap(null);
 			}
 			tmpMarkersArray = [];
+		});
+		google.maps.event.addListener(map, 'click', function () {
+			infowindow.close();
 		});
 		window.onbeforeunload = function (e) {
 			if (('localStorage' in window) && window['localStorage'] != null) {
@@ -63,6 +67,7 @@ jQuery(function () {
 					delete client["altitude"];
 					delete client["heading"];
 					delete client["planned_tascruise"];
+
 				}
 				if (client.clienttype == "PILOT" || client.clienttype == "ATC") {
 					var marker = new google.maps.Marker({
@@ -83,27 +88,40 @@ jQuery(function () {
 		});
 	};
 	function makeBoxInfo(client) {
-		var title = "";
+		if (client.planned_hrsfuel && client.planned_hrsfuel > 0 && client.planned_minfuel && client.planned_minfuel > 0)
+			client["fuel"] = client.planned_hrsfuel + ":" + client.planned_minfuel;
+		if (client.planned_hrsenroute && client.planned_hrsenroute > 0 && client.planned_minenroute && client.planned_minenroute > 0)
+			client["enroute"] = client.planned_hrsenroute + ":" + client.planned_minenroute;
+		var title = "<table>";
 		for (var key in client) {
+			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude", "facilitytype", "planned_hrsfuel", "planned_minfuel", "planned_hrsenroute", "planned_minenroute"]) != -1) {
+				continue;
+			}
 			var client_val = client[key];
 			var client_key = key;
+			if ((client_key == "planned_route" || client_key == "planned_remarks") && client_val) {
+				client_val = "<details>" + client_val + "</details>";
+			}
+			if ((client_key == "planned_deptime" || client_key == "planned_actdeptime")) {
+				if (client_val == 0) {
+					continue;
+				} else {
+					client_val = client_val.substring(0, 2) + ":" + client_val.substring(2, 4);
+				}
+			}
+			if (key == "time_last_atis_received")
+				client_key = "atis received";
+			if (key == "time_logon")
+				client_key = "logon";
+			if ((key == "time_logon" || key == "time_last_atis_received") && client[key]) {
+				client_val = client_val.substring(8, 10) + ":" + client_val.substring(10, 12) + ":" + client_val.substring(12, 14);
+			}
 			if (client_key.substring(0, 8) == "planned_") {
 				client_key = client_key.substring(8, client_key.length);
 			}
-			if (client_key.substring(0, 5) == "time_") {
-				client_key = client_key.substring(5, client_key.length);
-			}
-			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude"]) == -1) {
-				if ((key == "time_logon" || key == "time_last_atis_received") && client[key]) {
-					client_val = client_val.substring(8, 10) + ":" + client_val.substring(10, 12) + ":" + client_val.substring(12, 14);
-				}
-				if (key == "planned_route" || key == "planned_remarks") {
-					title += "<details><summary><b>" + client_key + ": " + "</b><br></summary>" + client[key] + "</details>";
-				} else {
-					title += "<b>" + client_key + ": </b>" + client_val + "<br>";
-				}
-			}
+			title += "<tr><td>" + client_key + "</td><td><b>" + client_val + "</b></td></tr>";
 		}
+		title += "</table>";
 		return "<div class='info'>" + title + "</div>";
 	}
 	function openInfoWindow(content, map, marker) {
@@ -160,11 +178,13 @@ jQuery(function () {
 		}
 		alert(s);
 	}
-	initialize();
-	$("#showTopAirports").click(function () {
-		showTopAirports();
-	});
-	$("#cssearch").click(function () {
-		searchForCallsign($('#search').val());
+	$(document).ready(function () {
+		initialize();
+		$("#showTopAirports").click(function () {
+			showTopAirports();
+		});
+		$("#cssearch").click(function () {
+			searchForCallsign($('#search').val());
+		});
 	});
 });
