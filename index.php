@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Vatsim Map Online</title>
+<title>Vatsim Flight Map Online</title>
 <meta name="description" content="Vatsim flights online on google map: aircrafts and ATC. Update time: every 5 min.">
 <link rel="shortcut icon" href="favicon.ico"/>
 <link rel="icon" href="favicon.ico"/>

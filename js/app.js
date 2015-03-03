@@ -122,6 +122,8 @@ jQuery(function ($) {
 			title += "<tr><td>" + client_key + "</td><td><b>" + client_val + "</b></td></tr>";
 		}
 		title += "</table>";
+		console.log(client.cid);
+		title +="<a href=\"http://vataware.com/pilot/"+client.cid+"\""+" target=\"_blank\">Another flights (Vataware)</a>";
 		return "<div class='info'>" + title + "</div>";
 	}
 	function openInfoWindow(content, map, marker) {
