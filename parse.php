@@ -70,18 +70,15 @@ foreach ($clients as $key => $item) {
         if ($v === "" || in_array($k, array(
             //"time_logon",
             "rating",
-            "protrevision",
-            "QNH_Mb",
-            "QNH_iHg",
+			"protrevision",
+			"server",
             "planned_destairport_lon",
             "planned_destairport_lat",
+			"planned_revision",
             "planned_depairport_lon",
             "planned_depairport_lat",
-            "planned_minfuel",
-            "planned_minenroute",
-            "planned_actdeptime",
-            "planned_revision",
-            "server"
+			"planned_flighttype",
+			"atis_message"
         ))) {
             unset($clients_final[$key][$k]);
         }

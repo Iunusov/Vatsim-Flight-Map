@@ -15,8 +15,7 @@
   #map_canvas { height: 100% }
   .info{
   font-size:small;
-height:200px;
-width: 200px;
+
 overflow-x:hidden;
 }
 </style>

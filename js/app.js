@@ -60,6 +60,9 @@ jQuery(function () {
 				}
 				if (client.clienttype == "ATC") {
 					icon = "/img/control.png";
+					delete client["altitude"];
+					delete client["heading"];
+					delete client["planned_tascruise"];
 				}
 				if (client.clienttype == "PILOT" || client.clienttype == "ATC") {
 					var marker = new google.maps.Marker({
@@ -83,6 +86,10 @@ jQuery(function () {
 		var title = "";
 		for (var key in client) {
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude"]) == -1) {
+				if ((key == "time_logon" || key == "time_last_atis_received")&&client[key]) {
+					var str = client[key];
+					client[key] = str.substring(8, 10) + ":" + str.substring(10, 12)+ ":" + str.substring(12, 14);
+				}
 				if (key == "planned_route" || key == "planned_remarks") {
 					title += "<details><summary><b>" + key + ": " + "</b><br></summary>" + client[key] + "</details>";
 				} else {
