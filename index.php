@@ -27,10 +27,10 @@ position: absolute; top: 0px; right: 115px; z-index: 50; margin-top: 5px
 </head>
 <body>
 <div id="menu">
-<div style="margin-left: 60px;">
-<input id="search" style="margin-bottom: 2px; width: 90px; " type="text" placeholder="Search callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();">
+<div style="margin-left: 33px;">
+<input id="search" style="margin-bottom: 2px; width: 90px; " type="text" placeholder="Callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();">
 <div style="float:right; margin-left: 5px">
-<input id="cssearch" type="button" value="go"> 
+<input id="cssearch" type="button" value="Search!"> 
 </div>
 </div>
 </div>

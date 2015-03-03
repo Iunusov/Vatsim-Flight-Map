@@ -87,15 +87,15 @@ jQuery(function () {
 		for (var key in client) {
 			var client_val = client[key];
 			var client_key = key;
-			if(client_key.substring(0, 8) == "planned_"){
+			if (client_key.substring(0, 8) == "planned_") {
 				client_key = client_key.substring(8, client_key.length);
 			}
-			if(client_key.substring(0, 5) == "time_"){
+			if (client_key.substring(0, 5) == "time_") {
 				client_key = client_key.substring(5, client_key.length);
 			}
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude"]) == -1) {
-				if ((key == "time_logon" || key == "time_last_atis_received")&&client[key]) {
-					client_val = client_val.substring(8, 10) + ":" + client_val.substring(10, 12)+ ":" + client_val.substring(12, 14);
+				if ((key == "time_logon" || key == "time_last_atis_received") && client[key]) {
+					client_val = client_val.substring(8, 10) + ":" + client_val.substring(10, 12) + ":" + client_val.substring(12, 14);
 				}
 				if (key == "planned_route" || key == "planned_remarks") {
 					title += "<details><summary><b>" + client_key + ": " + "</b><br></summary>" + client[key] + "</details>";
