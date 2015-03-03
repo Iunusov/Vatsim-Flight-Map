@@ -88,9 +88,9 @@ jQuery(function ($) {
 		});
 	};
 	function makeBoxInfo(client) {
-		if (client.planned_hrsfuel && client.planned_hrsfuel > 0 && client.planned_minfuel && client.planned_minfuel > 0)
+		if (client.planned_hrsfuel && client.planned_hrsfuel > 0 || client.planned_minfuel && client.planned_minfuel > 0)
 			client["fuel"] = client.planned_hrsfuel + ":" + client.planned_minfuel;
-		if (client.planned_hrsenroute && client.planned_hrsenroute > 0 && client.planned_minenroute && client.planned_minenroute > 0)
+		if (client.planned_hrsenroute && client.planned_hrsenroute > 0 || client.planned_minenroute && client.planned_minenroute > 0)
 			client["enroute"] = client.planned_hrsenroute + ":" + client.planned_minenroute;
 		var title = "<table>";
 		for (var key in client) {
