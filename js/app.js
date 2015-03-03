@@ -8,7 +8,7 @@ jQuery(function () {
 	var tmpMarkersArray = [];
 	var initLocation = new google.maps.LatLng(48.35719, 14.55371);
 	var defaultLocation = new google.maps.LatLng(initLocation.lat(), initLocation.lng());
-	var zoom = 3;
+	var zoom = 5;
 	if (('localStorage' in window) && window['localStorage'] != null) {
 		if (localStorage.getItem('map_center_lat') && localStorage.getItem('map_center_lng')) {
 			defaultLocation = new google.maps.LatLng(localStorage.getItem('map_center_lat'), localStorage.getItem('map_center_lng'));
@@ -85,15 +85,22 @@ jQuery(function () {
 	function makeBoxInfo(client) {
 		var title = "";
 		for (var key in client) {
+			var client_val = client[key];
+			var client_key = key;
+			if(client_key.substring(0, 8) == "planned_"){
+				client_key = client_key.substring(8, client_key.length);
+			}
+			if(client_key.substring(0, 5) == "time_"){
+				client_key = client_key.substring(5, client_key.length);
+			}
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude"]) == -1) {
 				if ((key == "time_logon" || key == "time_last_atis_received")&&client[key]) {
-					var str = client[key];
-					client[key] = str.substring(8, 10) + ":" + str.substring(10, 12)+ ":" + str.substring(12, 14);
+					client_val = client_val.substring(8, 10) + ":" + client_val.substring(10, 12)+ ":" + client_val.substring(12, 14);
 				}
 				if (key == "planned_route" || key == "planned_remarks") {
-					title += "<details><summary><b>" + key + ": " + "</b><br></summary>" + client[key] + "</details>";
+					title += "<details><summary><b>" + client_key + ": " + "</b><br></summary>" + client[key] + "</details>";
 				} else {
-					title += "<b>" + key + ": </b>" + client[key] + "<br>";
+					title += "<b>" + client_key + ": </b>" + client_val + "<br>";
 				}
 			}
 		}
