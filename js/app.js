@@ -7,9 +7,9 @@ jQuery(function ($) {
 			maxWidth : 400
 		});
 	var tmpMarkersArray = [];
-	var initLocation = new google.maps.LatLng(48.35719, 14.55371);
+	var initLocation = new google.maps.LatLng(44.996883999209636, -18.800782187499979);
 	var defaultLocation = new google.maps.LatLng(initLocation.lat(), initLocation.lng());
-	var zoom = 5;
+	var zoom = 3;
 	if (('localStorage' in window) && window['localStorage'] != null) {
 		if (localStorage.getItem('map_center_lat') && localStorage.getItem('map_center_lng')) {
 			defaultLocation = new google.maps.LatLng(localStorage.getItem('map_center_lat'), localStorage.getItem('map_center_lng'));
@@ -33,6 +33,9 @@ jQuery(function ($) {
 		});
 		google.maps.event.addListener(map, 'click', function () {
 			infowindow.close();
+			console.log(map.getCenter().lat());
+			console.log(map.getCenter().lng());
+			console.log(map.zoom);
 		});
 		window.onbeforeunload = function (e) {
 			if (('localStorage' in window) && window['localStorage'] != null) {
@@ -123,7 +126,7 @@ jQuery(function ($) {
 		}
 		title += "</table>";
 		console.log(client.cid);
-		title +="<a href=\"http://vataware.com/pilot/"+client.cid+"\""+" target=\"_blank\">Another flights (Vataware)</a>";
+		title +="<a href=\"http://vataware.com/pilot/"+client.cid+"\""+" target=\"_blank\">Past flights (Vataware)</a>";
 		return "<div class='info'>" + title + "</div>";
 	}
 	function openInfoWindow(content, map, marker) {
