@@ -78,7 +78,8 @@ foreach ($clients as $key => $item) {
             "planned_depairport_lon",
             "planned_depairport_lat",
 			"planned_flighttype",
-			"atis_message"
+			"atis_message",
+			"planned_actdeptime"
         ))) {
             unset($clients_final[$key][$k]);
         }
