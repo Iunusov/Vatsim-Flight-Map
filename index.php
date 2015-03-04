@@ -38,15 +38,5 @@ position: absolute; top: 0px; right: 115px; z-index: 50; margin-top: 5px; margin
 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyA9zHzTYMK-qrIeDaC-DBdWab3UsN1UBFE&amp;sensor=true"></script>
 <script src="/js/libs/jquery-1.11.2.min.js"></script>
 <script type="text/javascript" src="/js/app.js?<?=md5_file('js/app.js');?>"></script>
-<script type="text/javascript">
-var sc_project=10266561; 
-var sc_invisible=1; 
-var sc_security="ccb0c03c"; 
-var scJsHost = (("https:" == document.location.protocol) ?
-"https://secure." : "http://www.");
-document.write("<sc"+"ript type='text/javascript' src='" +
-scJsHost+
-"statcounter.com/counter/counter.js'></"+"script>");
-</script>
 </body>
 </html>
