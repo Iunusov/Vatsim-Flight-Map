@@ -35,7 +35,7 @@ position: absolute; top: 0px; right: 115px; z-index: 50; margin-top: 5px; margin
 </div>
 </div>
 <div id="map_canvas">
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyA9zHzTYMK-qrIeDaC-DBdWab3UsN1UBFE&amp;sensor=true"></script>
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js"></script>
 <script src="/js/libs/jquery-1.11.2.min.js"></script>
 <script type="text/javascript" src="/js/app.js?<?=md5_file('js/app.js');?>"></script>
 </body>
