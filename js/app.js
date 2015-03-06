@@ -18,9 +18,9 @@ jQuery(function ($) {
 			zoom = parseInt(localStorage.getItem('map_zoom'));
 		}
 	}
-	function formatNumber (num) {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
-}
+	function formatNumber(num) {
+		return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+	}
 	function initialize() {
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
 				zoom : zoom,
@@ -35,6 +35,11 @@ jQuery(function ($) {
 			tmpMarkersArray = [];
 		});
 		google.maps.event.addListener(map, 'click', function () {
+			infowindow.vs_cid = -1;
+			for (var i in tmpMarkersArray) {
+				tmpMarkersArray[i].setMap(null);
+			}
+			tmpMarkersArray = [];
 			infowindow.close();
 		});
 		window.onbeforeunload = function (e) {
@@ -92,18 +97,18 @@ jQuery(function ($) {
 	};
 	function makeBoxInfo(cl) {
 		var client = $.extend(true, {}, cl);
-		if("altitude" in client){
-			client.altitude = formatNumber(parseInt(client.altitude))+" ft";
+		if ("altitude" in client) {
+			client.altitude = formatNumber(parseInt(client.altitude)) + " ft";
 		}
-		if("groundspeed" in client)
-		client.groundspeed += " kts";
-		if("planned_tascruise" in client)
-		client.planned_tascruise += " kts";
+		if ("groundspeed" in client)
+			client.groundspeed += " kts";
+		if ("planned_tascruise" in client)
+			client.planned_tascruise += " kts";
 		if (client.planned_hrsfuel && client.planned_hrsfuel > 0 || client.planned_minfuel && client.planned_minfuel > 0)
-			client["fuel on board"] = client.planned_hrsfuel + "h " + client.planned_minfuel+"m"
-		if (client.planned_hrsenroute && client.planned_hrsenroute > 0 || client.planned_minenroute && client.planned_minenroute > 0)
-			client["enroute"] = client.planned_hrsenroute + "h " + client.planned_minenroute+"m";
-		var title = "<table>";
+			client["fuel on board"] = client.planned_hrsfuel + "h " + client.planned_minfuel + "m"
+				if (client.planned_hrsenroute && client.planned_hrsenroute > 0 || client.planned_minenroute && client.planned_minenroute > 0)
+					client["enroute"] = client.planned_hrsenroute + "h " + client.planned_minenroute + "m";
+				var title = "<table>";
 		for (var key in client) {
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude", "facilitytype", "planned_hrsfuel", "planned_minfuel", "planned_hrsenroute", "planned_minenroute"]) != -1) {
 				continue;
@@ -114,10 +119,10 @@ jQuery(function ($) {
 				client_val = "<details>" + client_val + "</details>";
 			}
 			if ((client_key == "planned_deptime" || client_key == "planned_actdeptime")) {
-					while(client_val.length < 4){
-						client_val = "0"+client_val;
-					}
-					client_val = client_val.substring(0, 2) + ":" + client_val.substring(2, 4);
+				while (client_val.length < 4) {
+					client_val = "0" + client_val;
+				}
+				client_val = client_val.substring(0, 2) + ":" + client_val.substring(2, 4);
 			}
 			if (key == "time_last_atis_received")
 				client_key = "atis received";
