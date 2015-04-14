@@ -29,14 +29,14 @@ jQuery(function ($) {
 			});
 		google.maps.event.addListener(infowindow, 'closeclick', function () {
 			infowindow.vs_cid = -1;
-			for (var i in tmpMarkersArray) {
+			for (var i = 0; i < tmpMarkersArray.length; i++) {
 				tmpMarkersArray[i].setMap(null);
 			}
 			tmpMarkersArray = [];
 		});
 		google.maps.event.addListener(map, 'click', function () {
 			infowindow.vs_cid = -1;
-			for (var i in tmpMarkersArray) {
+			for (var i=0;i<tmpMarkersArray.length;i++) {
 				tmpMarkersArray[i].setMap(null);
 			}
 			tmpMarkersArray = [];
@@ -54,7 +54,7 @@ jQuery(function ($) {
 	};
 	function loopFunction() {
 		$.getJSON("/clients.json?" + Math.random(), function (data) {
-			for (var i in markersArray) {
+			for (var i=0;i<markersArray.length;i++) {
 				if (infowindow.vs_cid === clients[markersArray[i].client_array_id].cid)
 					tmpMarkersArray.push(markersArray[i]);
 				else
@@ -110,6 +110,9 @@ jQuery(function ($) {
 					client["enroute"] = client.planned_hrsenroute + "h " + client.planned_minenroute + "m";
 				var title = "<table>";
 		for (var key in client) {
+			if(!client.hasOwnProperty(key)){
+			  continue;
+			}
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude", "facilitytype", "planned_hrsfuel", "planned_minfuel", "planned_hrsenroute", "planned_minenroute"]) != -1) {
 				continue;
 			}
@@ -146,7 +149,7 @@ jQuery(function ($) {
 	};
 	function searchForCallsign(callsign) {
 		callsign = $.trim(callsign.toUpperCase());
-		for (var i in markersArray) {
+		for (var i=0;i<markersArray.length;i++) {
 			if (markersArray[i].callsign == callsign) {
 				openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
 			}
