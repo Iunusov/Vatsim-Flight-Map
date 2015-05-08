@@ -36,7 +36,7 @@ jQuery(function ($) {
 		});
 		google.maps.event.addListener(map, 'click', function () {
 			infowindow.vs_cid = -1;
-			for (var i=0;i<tmpMarkersArray.length;i++) {
+			for (var i = 0; i < tmpMarkersArray.length; i++) {
 				tmpMarkersArray[i].setMap(null);
 			}
 			tmpMarkersArray = [];
@@ -51,10 +51,13 @@ jQuery(function ($) {
 		};
 		loopFunction();
 		setInterval(loopFunction, 60000);
+		if (window != window.top) {
+			$("#copyright").show();
+		}
 	};
 	function loopFunction() {
-		$.getJSON("/clients.json?" + Math.random(), function (data) {
-			for (var i=0;i<markersArray.length;i++) {
+		$.getJSON("/clients.json", function (data) {
+			for (var i = 0; i < markersArray.length; i++) {
 				if (infowindow.vs_cid === clients[markersArray[i].client_array_id].cid)
 					tmpMarkersArray.push(markersArray[i]);
 				else
@@ -93,6 +96,9 @@ jQuery(function ($) {
 					markersArray.push(marker);
 				}
 			});
+			if (window != window.top) {
+				$("#copyright").show();
+			}
 		});
 	};
 	function makeBoxInfo(cl) {
@@ -105,13 +111,13 @@ jQuery(function ($) {
 		if ("planned_tascruise" in client)
 			client.planned_tascruise += " kts";
 		if (client.planned_hrsfuel && client.planned_hrsfuel > 0 || client.planned_minfuel && client.planned_minfuel > 0)
-			client["fuel on board"] = client.planned_hrsfuel + "h " + client.planned_minfuel + "m"
-				if (client.planned_hrsenroute && client.planned_hrsenroute > 0 || client.planned_minenroute && client.planned_minenroute > 0)
-					client["enroute"] = client.planned_hrsenroute + "h " + client.planned_minenroute + "m";
-				var title = "<table>";
+			client["fuel on board"] = client.planned_hrsfuel + "h " + client.planned_minfuel + "m";
+		if (client.planned_hrsenroute && client.planned_hrsenroute > 0 || client.planned_minenroute && client.planned_minenroute > 0)
+			client["enroute"] = client.planned_hrsenroute + "h " + client.planned_minenroute + "m";
+		var title = "<table>";
 		for (var key in client) {
-			if(!client.hasOwnProperty(key)){
-			  continue;
+			if (!client.hasOwnProperty(key)) {
+				continue;
 			}
 			if ($.inArray(key, ["cid", "clienttype", "latitude", "longitude", "facilitytype", "planned_hrsfuel", "planned_minfuel", "planned_hrsenroute", "planned_minenroute"]) != -1) {
 				continue;
@@ -149,7 +155,7 @@ jQuery(function ($) {
 	};
 	function searchForCallsign(callsign) {
 		callsign = $.trim(callsign.toUpperCase());
-		for (var i=0;i<markersArray.length;i++) {
+		for (var i = 0; i < markersArray.length; i++) {
 			if (markersArray[i].callsign == callsign) {
 				openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
 			}

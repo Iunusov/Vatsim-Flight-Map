@@ -7,7 +7,7 @@ Header set Content-Encoding "gzip"
 Header set Cache-Control "max-age=290304000, public"
 </FilesMatch>
 
-<FilesMatch "\.(html|htm)$">
+<FilesMatch "\.(html|htm|json)$">
 FileETag None
 <ifModule mod_headers.c>
 Header unset ETag
