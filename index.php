@@ -26,6 +26,7 @@ position: absolute; top: 0px; right: 115px; z-index: 50; margin-top: 5px; margin
 </style>
 </head>
 <body>
+<div id="copyright" style="position:absolute; left:35px; top:0; z-index:100;display:none">Powered by <a href="//vatmap.jsound.org" target="_blank">vatmap.jsound.org</a></div>
 <div id="menu">
 <div>
 <input id="search" style="margin-bottom: 2px; width: 90px; " type="text" placeholder="Callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();">
