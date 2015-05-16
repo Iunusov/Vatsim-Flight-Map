@@ -50,7 +50,7 @@ jQuery(function ($) {
 			}
 		};
 		loopFunction();
-		setInterval(loopFunction, 60000);
+		setInterval(loopFunction, 180000);
 		if (window != window.top) {
 			$("#copyright").show();
 		}
