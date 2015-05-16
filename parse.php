@@ -1,3 +1,4 @@
+#!/usr/local/bin/php-cli
 <?php
 if(!(php_sapi_name() === 'cli')) die("\nnot cli\n");
 function errHandle($errNo, $errStr, $errFile, $errLine) {
@@ -98,17 +99,9 @@ if (!$result_json) {
 	die("\njson_encode fails\n");
 }
 
-$result_gzip = false;
-
-$result_gzip = gzencode($result_json, 9);
-
-if (!$result_gzip) {
-	die("\ngzencode fails\n");
-}
-
 $res = false;
 
-$res = file_put_contents("./clients.json", $result_gzip);
+$res = file_put_contents("./clients.json", $result_json);
 
 if(!$res){
 	die("\nfile_put_contents fails\n");
