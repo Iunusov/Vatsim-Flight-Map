@@ -1,7 +1,5 @@
 #!/usr/local/bin/php-cli
 <?php
-if (!(php_sapi_name() === 'cli')) die("not cli!" . PHP_EOL);
-
 $arUrl = array(
     "http://www.pcflyer.net/DataFeed/vatsim-data.txt",
     "http://fsproshop.com/servinfo/vatsim-data.txt",

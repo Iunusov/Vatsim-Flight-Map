@@ -1,7 +1,6 @@
 #!/usr/local/bin/php-cli
 
 <?php
-if(!(php_sapi_name() === 'cli')) die("\nnot cli\n");
 define("TARGET_DIR", "../../img/planes/");
 $source = imagecreatefrompng("source.png");
 imagealphablending($source, false);
