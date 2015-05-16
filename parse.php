@@ -1,12 +1,12 @@
 #!/usr/local/bin/php-cli
 <?php
-if(!(php_sapi_name() === 'cli')) die("\nnot cli\n");
+if(!(php_sapi_name() === 'cli')) die("not cli!".PHP_EOL);
 function errHandle($errNo, $errStr, $errFile, $errLine) {
     $msg = "$errStr in $errFile on line $errLine";
     if ($errNo == E_NOTICE || $errNo == E_WARNING) {
         throw new ErrorException($msg, $errNo);
     } else {
-        echo $msg;
+        die($msg.PHP_EOL);
     }
 }
 ini_set('display_startup_errors', 1);
@@ -37,19 +37,19 @@ foreach ($arUrl as $url) {
     }
 }
 if (!$data) {
-    die("\nerror during downloading vatsim-data.txt\n");
+    die("error during downloading vatsim-data.txt".PHP_EOL);
 }
 
 preg_match("/!CLIENTS:(.*)" . PHP_EOL . ";" . PHP_EOL . ";" . PHP_EOL . "!SERVERS:/s", $data, $clients);
 
 if (!isset($clients[1])) {
-    die("\ncannot parse !CLIENTS\n");
+    die("cannot parse !CLIENTS".PHP_EOL);
 }
 
 preg_match_all("/(.*):" . PHP_EOL . "/", $clients[1], $clients);
 
 if (!isset($clients[1])) {
-    die("\ncannot parse !CLIENTS container\n");
+    die("cannot parse !CLIENTS container".PHP_EOL);
 }
 
 $clients = $clients[1];
@@ -57,7 +57,7 @@ $clients = $clients[1];
 preg_match("/!CLIENTS section -(.*):" . PHP_EOL . "; !PREFILE/", $data, $clients_tpl);
 
 if (!isset($clients_tpl[1])) {
-    die("\ncannot parse clients_tpl\n");
+    die("cannot parse clients_tpl".PHP_EOL);
 }
 
 
@@ -88,7 +88,7 @@ foreach ($clients as $key => $item) {
 }
 
 if (!count($clients_final)) {
-	die("\ncount(clients_final) = 0\n");
+	die("count(clients_final) = 0".PHP_EOL);
 }
 
 $result_json = false;
@@ -96,7 +96,7 @@ $result_json = false;
 $result_json = json_encode($clients_final);
 
 if (!$result_json) {
-	die("\njson_encode fails\n");
+	die("json_encode fails".PHP_EOL);
 }
 
 $res = false;
@@ -104,9 +104,9 @@ $res = false;
 $res = file_put_contents("./clients.json", $result_json);
 
 if(!$res){
-	die("\nfile_put_contents fails\n");
+	die("file_put_contents fails".PHP_EOL);
 }
-
+echo("ok".PHP_EOL);
 exit (0);
 
 ?>
