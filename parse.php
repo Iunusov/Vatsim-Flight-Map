@@ -78,7 +78,7 @@ function trytoparse($url){
         return false;
     }
     
-    $res = file_put_contents("./clients.json", $result_json);
+    $res = file_put_contents("./clients.json", $result_json, LOCK_EX);
     
     if (!$res) {
         echo ("file_put_contents fails ($url)" . PHP_EOL);
