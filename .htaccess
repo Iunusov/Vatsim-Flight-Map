@@ -1,8 +1,4 @@
-<filesMatch ".(ico|pdf|flv|jpg|jpeg|png|gif|css|swf)$">
-Header set Cache-Control "max-age=290304000, public"
-</FilesMatch>
-
-<FilesMatch "\.(html|htm|json|js)$">
+<FilesMatch "\.(json)$">
 FileETag None
 <ifModule mod_headers.c>
 Header unset ETag
