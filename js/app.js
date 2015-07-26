@@ -176,7 +176,7 @@ if (typeof jQuery === "function")
 					}
 				};
 				loopFunction();
-				setInterval(loopFunction, 180000);
+				setInterval(loopFunction, 60000);
 				if (window != window.top) {
 					$("#copyright").show();
 				}

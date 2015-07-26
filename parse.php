@@ -1,11 +1,12 @@
 #!/usr/local/bin/php-cli
 <?php
 $arUrl = array(
-    "http://www.pcflyer.net/DataFeed/vatsim-data.txt",
-    "http://fsproshop.com/servinfo/vatsim-data.txt",
-    "http://info.vroute.net/vatsim-data.txt",
-    "http://data.vattastic.com/vatsim-data.txt",
-    "http://vatsim.aircharts.org/vatsim-data.txt"
+"http://vatsim-data.hardern.net/vatsim-data.txt",
+"http://vatsim.aircharts.org/vatsim-data.txt",
+"http://data.vattastic.com/vatsim-data.txt",
+"http://info.vroute.net/vatsim-data.txt",
+"http://fsproshop.com/servinfo/vatsim-data.txt",
+"http://www.pcflyer.net/DataFeed/vatsim-data.txt"
 );
 
 function trytoparse($url){
@@ -82,7 +83,7 @@ function trytoparse($url){
         echo ("file_put_contents fails ($url)" . PHP_EOL);
         return false;
     }
-    echo ("ok ($url)" . PHP_EOL);
+    //echo ("ok ($url)" . PHP_EOL);
     return true;
 }
 
