@@ -1,17 +1,19 @@
 #!/usr/local/bin/php-cli
 <?php
 $arUrl = array(
-"http://vatsim-data.hardern.net/vatsim-data.txt",
-"http://vatsim.aircharts.org/vatsim-data.txt",
-"http://data.vattastic.com/vatsim-data.txt",
 "http://info.vroute.net/vatsim-data.txt",
-"http://fsproshop.com/servinfo/vatsim-data.txt",
-"http://www.pcflyer.net/DataFeed/vatsim-data.txt"
+"http://data.vattastic.com/vatsim-data.txt",
+"http://vatsim.aircharts.org/vatsim-data.txt",
+"http://vatsim-data.hardern.net/vatsim-data.txt"
 );
+
+function loadServersArray(){
+	return @json_decode(@file_get_contents("./vatsim_servers.json"), true);
+}
 
 function trytoparse($url){
     $clients_container = Array();
-    $data = @file_get_contents($url);
+    $data = file_get_contents($url);
     if (!$data) {
         echo ("file_get_contents fails... ($url)" . PHP_EOL);
         return false;
@@ -87,6 +89,14 @@ function trytoparse($url){
     return true;
 }
 
+$serversArray = loadServersArray();
+
+if(count($serversArray) <= 0){
+	echo ("loadServersArray() fails!" . PHP_EOL);
+}
+else{
+	$arUrl = $serversArray;
+}
 shuffle($arUrl);
 
 foreach ($arUrl as $url) {
