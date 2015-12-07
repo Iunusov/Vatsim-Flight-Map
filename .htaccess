@@ -10,7 +10,7 @@ Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
 
 
 
-<FilesMatch "parse\.php|.git|.gitignore">
+<FilesMatch "parse\.php|get_servers\.php|.git|.gitignore">
   Order allow,deny
   Deny from all
 </FilesMatch>
