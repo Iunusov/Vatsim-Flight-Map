@@ -185,7 +185,9 @@ if (typeof jQuery === "function")
 				callsign = $.trim(callsign.toUpperCase());
 				for (var i = 0; i < markersArray.length; i++) {
 					if (markersArray[i].callsign === callsign) {
-						openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
+						$(':focus').blur();
+						setTimeout(function(){openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i])}, 300);
+						break;
 					}
 				}
 			}
