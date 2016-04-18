@@ -1,0 +1,12 @@
+{
+  "name": "Vatsim Map",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "index.htm",
+  "display": "standalone"
+}
