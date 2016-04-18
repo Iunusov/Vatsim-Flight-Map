@@ -8,24 +8,24 @@ $arUrl = array(
 );
 
 function loadServersArray(){
-	return @json_decode(@file_get_contents("./vatsim_servers.json"), true);
+	return json_decode(file_get_contents("./vatsim_servers.json"), true);
 }
 
 function trytoparse($url){
     $clients_container = Array();
     $data = file_get_contents($url);
     if (!$data) {
-        echo ("file_get_contents fails... ($url)" . PHP_EOL);
         return false;
     }
-    @preg_match("/!CLIENTS:(.*)" . PHP_EOL . ";" . PHP_EOL . ";" . PHP_EOL . "!SERVERS:/s", $data, $clients_container);
+    preg_match("/!CLIENTS:(.*)" . PHP_EOL . ";" . PHP_EOL . ";" . PHP_EOL . "!SERVERS:/s", $data, $clients_container);
+	
+	
     if (!isset($clients_container[1])) {
-        echo ("can't parse data ($url)" . PHP_EOL);
-        return false;
+		return false;
     }
     $clients = "";
     
-    @preg_match_all("/(.*):" . PHP_EOL . "/", $clients_container[1], $clients);
+    preg_match_all("/(.*):" . PHP_EOL . "/", $clients_container[1], $clients);
     
     if (!isset($clients[1])) {
         echo ("cannot parse !CLIENTS container ($url)" . PHP_EOL);
@@ -34,7 +34,7 @@ function trytoparse($url){
     
     $clients = $clients[1];
     
-    @preg_match("/!CLIENTS section -(.*):" . PHP_EOL . "; !PREFILE/", $data, $clients_tpl);
+    preg_match("/; !CLIENTS section -(.*):" . PHP_EOL . "; !PREFILE/", $data, $clients_tpl);
     
     if (!isset($clients_tpl[1])) {
         echo ("cannot parse clients_tpl ($url)" . PHP_EOL);
@@ -44,7 +44,10 @@ function trytoparse($url){
     $clients_final = array();
     
     foreach ($clients as $key => $item) {
-        $clients_final[$key] = array_combine(explode(":", trim($clients_tpl[1])), explode(":", $item));
+        $clients_final[$key] = array_combine(explode(":", trim($clients_tpl[1])), explode(":", trim($item)));
+		if(!$clients_final[$key]){
+			return false;
+		}
         foreach ($clients_final[$key] as $k => $v) {
             if ($k == "atis_message" && $clients_final[$key][$k])
                 $clients_final[$key][$k] = htmlentities($clients_final[$key][$k]);
