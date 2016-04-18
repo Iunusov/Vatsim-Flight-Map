@@ -186,7 +186,7 @@ if (typeof jQuery === "function")
 				for (var i = 0; i < markersArray.length; i++) {
 					if (markersArray[i].callsign === callsign) {
 						$(':focus').blur();
-						setTimeout(function(){openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i])}, 300);
+						setTimeout(function(){openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i])}, 100);
 						break;
 					}
 				}
