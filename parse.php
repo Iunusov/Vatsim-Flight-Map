@@ -13,8 +13,8 @@ function loadServersArray(){
 
 function trytoparse($url){
     $clients_container = Array();
-    $data = file_get_contents($url);
-    if (!$data) {
+    $data = @file_get_contents($url);
+    if ($data === false) {
         return false;
     }
     preg_match("/!CLIENTS:(.*)" . PHP_EOL . ";" . PHP_EOL . ";" . PHP_EOL . "!SERVERS:/s", $data, $clients_container);
