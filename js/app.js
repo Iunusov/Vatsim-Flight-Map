@@ -151,7 +151,8 @@ if (typeof jQuery === "function")
 				map = new google.maps.Map(document.getElementById("map_canvas"), {
 						zoom : zoom,
 						center : defaultLocation,
-						mapTypeId : google.maps.MapTypeId.ROADMAP
+						mapTypeId : google.maps.MapTypeId.ROADMAP,
+						streetViewControl: false
 					});
 				google.maps.event.addListener(infowindow, 'closeclick', function () {
 					infowindow.vs_cid = -1;
