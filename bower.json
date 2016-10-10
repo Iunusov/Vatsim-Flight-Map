@@ -1,0 +1,16 @@
+{
+  "name": "VatMap",
+  "homepage": "https://github.com/R-Tur/Vatsim-Flight-Map",
+  "authors": [
+    "Artur Iunusov <iunusov.artur@gmail.com>"
+  ],
+  "description": "Vatsim aircrafts and ATC on Google Maps.",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^3.3.x",
+    "jquery-ui": "latest",
+    "jquery": "latest"
+  }
+}

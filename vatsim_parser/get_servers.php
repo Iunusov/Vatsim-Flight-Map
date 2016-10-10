@@ -1,4 +1,4 @@
-#!/usr/local/bin/php-cli
+#!/usr/bin/php
 <?php
 	$statusURL = "http://status.vatsim.net/";
 	

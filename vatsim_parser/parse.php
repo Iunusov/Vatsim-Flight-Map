@@ -1,5 +1,6 @@
-#!/usr/local/bin/php-cli
+#!/usr/bin/php
 <?php
+include ("config.php");
 $arUrl = array(
 "http://info.vroute.net/vatsim-data.txt",
 "http://data.vattastic.com/vatsim-data.txt",
@@ -12,15 +13,18 @@ function loadServersArray(){
 }
 
 function trytoparse($url){
+	global $memcache_connection_path;
     $clients_container = Array();
-    $data = @file_get_contents($url);
-    if ($data === false) {
+    $data = file_get_contents($url);
+    if (!$data) {
+		echo ("file_get_contents($url) fails" . PHP_EOL);
         return false;
     }
     preg_match("/!CLIENTS:(.*)" . PHP_EOL . ";" . PHP_EOL . ";" . PHP_EOL . "!SERVERS:/s", $data, $clients_container);
 	
 	
     if (!isset($clients_container[1])) {
+		echo ("cannot parse data" . PHP_EOL);
 		return false;
     }
     $clients = "";
@@ -42,8 +46,13 @@ function trytoparse($url){
     }
     
     $clients_final = array();
-    
+    $tpl_array = explode(":", trim($clients_tpl[1]));
+	
     foreach ($clients as $key => $item) {
+		$cl_array = explode(":", trim($item));
+		if(count($tpl_array) != count($cl_array)){
+			continue;
+		}
         $clients_final[$key] = array_combine(explode(":", trim($clients_tpl[1])), explode(":", trim($item)));
 		if(!$clients_final[$key]){
 			return false;
@@ -61,7 +70,6 @@ function trytoparse($url){
                 "planned_revision",
                 "planned_depairport_lon",
                 "planned_depairport_lat",
-                "planned_flighttype",
                 "atis_message",
                 "planned_actdeptime"
             ))) {
@@ -81,14 +89,22 @@ function trytoparse($url){
         echo ("json_encode fails ($url)" . PHP_EOL);
         return false;
     }
-    
-    $res = file_put_contents("./clients.json", $result_json, LOCK_EX);
-    
-    if (!$res) {
-        echo ("file_put_contents fails ($url)" . PHP_EOL);
-        return false;
-    }
-    //echo ("ok ($url)" . PHP_EOL);
+	$m = new Memcache;
+	$m->connect(MEMCACHE_IP, MEMCACHE_PORT);
+	
+	$prev_data = $m->get("vatmap_clients_data");
+	if($prev_data){
+		if(md5($result_json) == $prev_data["vatmap_clients_json_md5"]){
+			$m->close();
+			return true;
+		}
+	}
+	
+	$m->set("vatmap_clients_data", array(
+    'vatmap_clients_json' => $result_json,
+    'vatmap_clients_json_md5' => md5($result_json),
+    'vatmap_clients_json_last_modified' => time()));
+	$m->close();
     return true;
 }
 

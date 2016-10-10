@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vatsim Flight Map</title>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" /><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Vatsim aircrafts and ATC on the Google Maps. Updated every 2 min.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" sizes="192x192" href="/icon.png">
+<link rel="canonical" href="//vatmap.jsound.org">
+<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+<style type="text/css">
+html { 
+	height: 100% 
+}
+body { 
+	height: 100%; 
+	margin: 0; 
+	padding: 0;
+	overflow-x: hidden; 
+}
+#map_canvas { 
+	height: 100%;
+	width:100%;
+	position:absolute;
+	top:0;
+	left:0;
+}
+.ui-autocomplete { height: 400px; overflow-y: scroll; overflow-x: hidden;}
+strong, b {
+    font-weight: bold;
+}
+</style>
+<base target="_blank" />
+</head>
+<body>
+<div id="map_canvas"></div>
+<div class="container">
+<div class="row" style="padding:5px">
+  <div class="col-xs-8 col-sm-4 pull-right">
+    <div class="input-group">
+      <input id="search" type="text" class="form-control" placeholder="Search for callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();" >
+      <span class="input-group-btn">
+        <button id="cssearch" class="btn btn-default" type="button">Search</button>
+      </span>
+    </div>
+  </div>
+</div>
+</div>
+
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js"></script>
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/js/app.js"></script>
+</body>
+</html>

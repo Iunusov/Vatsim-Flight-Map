@@ -1,5 +1,4 @@
-#!/usr/local/bin/php-cli
-
+#!/usr/bin/php
 <?php
 define("TARGET_DIR", "../../img/planes/");
 $source = imagecreatefrompng("source.png");
