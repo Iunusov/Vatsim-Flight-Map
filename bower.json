@@ -1,6 +1,6 @@
 {
   "name": "VatMap",
-  "homepage": "https://github.com/R-Tur/Vatsim-Flight-Map",
+  "homepage": "https://github.com/Iunusov/Vatsim-Flight-Map",
   "authors": [
     "Artur Iunusov <iunusov.artur@gmail.com>"
   ],
@@ -11,6 +11,7 @@
   "dependencies": {
     "bootstrap": "^3.3.x",
     "jquery-ui": "latest",
-    "jquery": "latest"
+    "jquery": "latest",
+    "html5shiv": "latest"
   }
 }

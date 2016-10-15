@@ -69,7 +69,7 @@ if (typeof jQuery === "function") {
 					"Planned Deptime" : formatDepTime(client, "planned_deptime"),
 					"Altairport" : getProp(client, "planned_altairport"),
 					"Remarks" : "<details>" + getProp(client, "planned_remarks") + "</details>",
-					"Route" : "<details>" + getProp(client, "planned_route") + "</details>",
+					"Route" : "<details><code>" + getProp(client, "planned_route") + "</code></details>",
 					"Logon" : formatDate(client, "time_logon"),
 					"Heading" : getProp(client, "heading"),
 					"QNH,iHg" : getProp(client, "QNH_iHg"),
@@ -131,7 +131,7 @@ if (typeof jQuery === "function") {
 				var that = this;
 				$.ajax({
 					type : "GET",
-					url : "/getclients.php",
+					url : "getclients.php",
 					contentType : "application/json",
 					dataType : "json",
 					success : function (data, textStatus, request) {
@@ -152,14 +152,14 @@ if (typeof jQuery === "function") {
 						that.callSignsArray = [];
 						$.each(data, function (index, client) {
 							that.callSignsArray.push(client.callsign);
-							var icon = "/img/undefined.png";
+							var icon = "img/undefined.png";
 							if (!client.heading)
 								client.heading = 0;
 							if (client.clienttype === "PILOT") {
-								icon = "/img/planes/" + (360 - Math.round(client.heading / 20) * 20) + ".png";
+								icon = "img/planes/" + (360 - Math.round(client.heading / 20) * 20) + ".png";
 							}
 							if (client.clienttype === "ATC") {
-								icon = "/img/control.png";
+								icon = "img/control.png";
 							}
 							if (client.clienttype === "PILOT" || client.clienttype === "ATC") {
 								var marker = new google.maps.Marker({

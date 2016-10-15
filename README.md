@@ -1,9 +1,7 @@
 # Vatsim Flight Map
 [Vatsim](https://wikipedia.org/wiki/VATSIM) aircrafts and ATC on Google Maps.
 
-<a href="//vatmap.jsound.org/">
-<img src="http://jsound.org/img/vatmap.png" alt="Vatsim Flight Map" height="506" width="856">
-</a>
+![Vatsim Flight Map](http://jsound.org/img/vatmap.png "Vatsim Flight Map")
 
 #Dependencies
 [PHP-GD](http://php.net/manual/ru/book.image.php)
@@ -12,15 +10,103 @@
 
 [Bower](https://bower.io/)
 
-#installation
+#Installation
 
-1) run <b>/generators/plane_angles/generate.php</b> from command-line (it will make necessary images)
+The following guide is for Ubuntu 16.04.
 
-2) add <b>/vatsim_parser/parse.php</b> script call to crontab, this script downloads data from vatsim (every 2 min)
+Install the required packages:
+```
+sudo apt-get update
+```
 
-3) add <b>/vatsim_parser/get_servers.php</b> script call to crontab (probably daily), in order to get vatsim servers list
+```
+sudo apt-get install nginx php-fpm memcached php-memcache php-gd  nodejs npm
+```
 
-4) Install JavaScript dependencies:
+```
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+```
+
+install bower:
+```
+sudo npm install bower -g
+```
+
+Enable php support in nginx:
+```
+sudo nano /etc/nginx/sites-available/default
+```
+
+```
+location ~ \.php$ {
+                #If a file isn’t found, 404
+                try_files $uri =404;
+                #Include Nginx’s fastcgi configuration
+                include /etc/nginx/fastcgi.conf;
+                #Look for the FastCGI Process Manager at this location
+                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        }
+```
+
+Restart the services:
+```
+sudo service php7.0-fpm restart
+sudo service nginx restart
+```
+
+```
+cd /var/www/html
+sudo chmod 757 .
+```
+
+```
+git clone https://github.com/Iunusov/Vatsim-Flight-Map
+cd Vatsim-Flight-Map
+```
+
+Install javascript dependencies:
 ```
 bower install
 ```
+
+Parse some data (for testing):
+```
+cd vatsim_parser
+./get_servers.php
+./parse.php
+```
+
+Generate plane images:
+```
+cd ../generators/plane_angles
+./generate.php
+```
+
+You probably might want to add these scripts to crontab:
+```
+*/2 * * * * cd /<path_to_your_site>/vatsim_parser; ./parse.php >> <logfile_name> 2>&1
+
+* */6 * * * cd /<path_to_your_site>/vatsim_parser; ./get_servers.php >> <logfile_name> 2>&1
+```
+**parse.php** is for parsing Vatsim data
+
+**get_servers.php** is for parsing Vatsim servers list (can be runned daily)
+
+Request API key for Google Maps:
+https://developers.google.com/maps/documentation/javascript/get-api-key (and edit index.html accordingly)
+
+otherwise, you will get the MissingKeyMapError
+
+Open url in your browser:
+```
+http://localhost/Vatsim-Flight-Map
+```
+
+#License
+
+MIT License
+
+#Demo
+
+https://vatmap.jsound.org/
+
