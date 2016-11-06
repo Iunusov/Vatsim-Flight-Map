@@ -3,6 +3,8 @@
 
 ![Vatsim Flight Map](http://jsound.org/img/vatmap.png "Vatsim Flight Map")
 
+![Vatsim Flight Map (Mobile)](http://jsound.org/img/vatmap_mobile.jpg "Vatsim Flight Map (Mobile)")
+
 ## Dependencies
 [PHP-GD](http://php.net/manual/ru/book.image.php)
 
