@@ -3,14 +3,14 @@
 
 ![Vatsim Flight Map](http://jsound.org/img/vatmap.png "Vatsim Flight Map")
 
-#Dependencies
+## Dependencies
 [PHP-GD](http://php.net/manual/ru/book.image.php)
 
 [Memcache](http://php.net/manual/ru/book.memcache.php)
 
 [Bower](https://bower.io/)
 
-#Installation
+## Installation
 
 The following guide is for Ubuntu 16.04.
 
@@ -102,11 +102,11 @@ Open url in your browser:
 http://localhost/Vatsim-Flight-Map
 ```
 
-#License
+## License
 
 MIT License
 
-#Demo
+## Demo
 
 https://vatmap.jsound.org/
 
