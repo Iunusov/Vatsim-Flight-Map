@@ -39,9 +39,9 @@ strong, b {
 <base target="_blank" />
 </head>
 <body>
-<div id="map_canvas"></div>
+<nav id="searchrow" class="navbar-fixed-top" style="z-index:999">
 <div class="container">
-<div class="row" style="padding:5px">
+<div id="searchrow" class="row" style="padding:5px">
   <div class="col-xs-8 col-sm-4 pull-right">
     <div class="input-group">
       <input id="search" type="text" class="form-control" placeholder="Search for callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();" >
@@ -49,9 +49,12 @@ strong, b {
         <button id="cssearch" class="btn btn-default" type="button">Search</button>
       </span>
     </div>
+	<p><a href="https://github.com/Iunusov/Vatsim-Flight-Map">[GitHub]</a></p>
   </div>
 </div>
 </div>
+</nav>
+<div id="map_canvas"></div>
 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js"></script>
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>

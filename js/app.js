@@ -109,6 +109,7 @@ if (typeof jQuery === "function") {
 				return "<div class='info'>" + title + "</div>";
 			}
 			var openInfoWindow = function (content, map, marker) {
+				$("#searchrow").hide();
 				setTimeout(function () {
 					$(':focus').blur();
 				}, 500);
@@ -205,15 +206,18 @@ if (typeof jQuery === "function") {
 				map = new google.maps.Map(document.getElementById("map_canvas"), {
 						zoom : zoom,
 						center : defaultLocation,
+						disableDefaultUI: true,
 						mapTypeId : mapTypeId,
 						streetViewControl : false,
 						mapTypeControl : true,
+						zoomControl : true,
 						mapTypeControlOptions : {
 							style : google.maps.MapTypeControlStyle.DEFAULT,
 							position : google.maps.ControlPosition.LEFT_BOTTOM
 						}
 					});
 				google.maps.event.addListener(infowindow, 'closeclick', function () {
+					$("#searchrow").show();
 					infowindow.vs_cid = -1;
 					for (var i = 0; i < tmpMarkersArray.length; i++) {
 						tmpMarkersArray[i].setMap(null);
@@ -221,6 +225,7 @@ if (typeof jQuery === "function") {
 					tmpMarkersArray = [];
 				});
 				google.maps.event.addListener(map, 'click', function () {
+					$("#searchrow").show();
 					infowindow.vs_cid = -1;
 					for (var i = 0; i < tmpMarkersArray.length; i++) {
 						tmpMarkersArray[i].setMap(null);

@@ -7,6 +7,6 @@
       "type": "image/png"
     }
   ],
-  "start_url": "index.htm",
+  "start_url": "index.html",
   "display": "standalone"
 }
