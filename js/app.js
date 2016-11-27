@@ -11,7 +11,6 @@ if (typeof jQuery === "function") {
 			var defaultLocation = null;
 			var mapTypeId = null;
 			var zoom = 3;
-			var currentCallsign = "";
 			this.getUrlParam = function (name, url) {
 				if (!url)
 					url = location.href;
@@ -207,8 +206,9 @@ if (typeof jQuery === "function") {
 					if (localStorage.getItem('map_type')) {
 						mapTypeId = localStorage.getItem('map_type');
 					}
-					if (localStorage.getItem('currentCallsign')) {
-						$("#search").val(localStorage.getItem('currentCallsign'));
+					var currentCallsign = localStorage.getItem('currentCallsign');
+					if (currentCallsign) {
+						$("#search").val(currentCallsign);
 					}
 				}
 				infowindow = new google.maps.InfoWindow({
@@ -240,13 +240,12 @@ if (typeof jQuery === "function") {
 						localStorage.setItem('map_center_lng', map.getCenter().lng());
 						localStorage.setItem('map_zoom', map.zoom);
 						localStorage.setItem('map_type', map.getMapTypeId());
-						localStorage.setItem('currentCallsign', currentCallsign);
+						localStorage.setItem('currentCallsign', $("#search").val());
 					}
 				};
 				setInterval(this.loopFunction, 60000 * 2);
 			};
 			this.searchForCallsign = function (callsign) {
-				currentCallsign = callsign;
 				callsign = $.trim(callsign.toUpperCase());
 				for (var i = 0; i < markersArray.length; i++) {
 					if (markersArray[i].callsign === callsign) {
