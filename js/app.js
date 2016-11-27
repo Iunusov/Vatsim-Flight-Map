@@ -11,6 +11,7 @@ if (typeof jQuery === "function") {
 			var defaultLocation = null;
 			var mapTypeId = null;
 			var zoom = 3;
+			var currentCallsign = "";
 			this.getUrlParam = function (name, url) {
 				if (!url)
 					url = location.href;
@@ -106,7 +107,7 @@ if (typeof jQuery === "function") {
 				title += "</table>";
 				title += "<br>";
 				title += "<a href=\"/?c=" + client.callsign + "\"" + " target=\"_blank\">Share link</a>";
-				return "<div>" + title + "</div>";
+				return "<div id='infoWindowContent'>" + title + "</div>";
 			}
 			var openInfoWindow = function (content, map, marker) {
 				if (window && window.history && window.history.pushState) {
@@ -121,6 +122,8 @@ if (typeof jQuery === "function") {
 				infowindow.vs_cid = clients[marker.client_array_id].cid;
 				infowindow.setContent(content);
 				infowindow.open(map, marker);
+				$("#searchrow").hide();
+				$("#infoWindowContent").parent().parent().css("max-height", "9999px");
 			};
 			this.callSignsArray = [];
 			this.loopFunction = function () {
@@ -169,7 +172,6 @@ if (typeof jQuery === "function") {
 									})
 									marker.setMap(map);
 								google.maps.event.addListener(marker, 'click', function () {
-									$("#searchrow").hide();
 									openInfoWindow(makeBoxInfo(client), map, marker);
 								});
 								markersArray.push(marker);
@@ -183,6 +185,15 @@ if (typeof jQuery === "function") {
 				});
 				return dfd.promise();
 			};
+			var onCloseInfoWindow = function () {
+				$("#searchrow").show();
+				infowindow.vs_cid = -1;
+				for (var i = 0; i < tmpMarkersArray.length; i++) {
+					tmpMarkersArray[i].setMap(null);
+				}
+				tmpMarkersArray = [];
+				history.replaceState({}, "state", "/");
+			}
 			this.initialize = function () {
 				defaultLocation = new google.maps.LatLng(44.996883999209636, -18.800782187499979);
 				mapTypeId = google.maps.MapTypeId.TERRAIN;
@@ -195,6 +206,9 @@ if (typeof jQuery === "function") {
 					}
 					if (localStorage.getItem('map_type')) {
 						mapTypeId = localStorage.getItem('map_type');
+					}
+					if (localStorage.getItem('currentCallsign')) {
+						$("#search").val(localStorage.getItem('currentCallsign'));
 					}
 				}
 				infowindow = new google.maps.InfoWindow({
@@ -214,20 +228,10 @@ if (typeof jQuery === "function") {
 						}
 					});
 				google.maps.event.addListener(infowindow, 'closeclick', function () {
-					$("#searchrow").show();
-					infowindow.vs_cid = -1;
-					for (var i = 0; i < tmpMarkersArray.length; i++) {
-						tmpMarkersArray[i].setMap(null);
-					}
-					tmpMarkersArray = [];
+					onCloseInfoWindow();
 				});
 				google.maps.event.addListener(map, 'click', function () {
-					$("#searchrow").show();
-					infowindow.vs_cid = -1;
-					for (var i = 0; i < tmpMarkersArray.length; i++) {
-						tmpMarkersArray[i].setMap(null);
-					}
-					tmpMarkersArray = [];
+					onCloseInfoWindow();
 					infowindow.close();
 				});
 				window.onbeforeunload = function (e) {
@@ -236,19 +240,17 @@ if (typeof jQuery === "function") {
 						localStorage.setItem('map_center_lng', map.getCenter().lng());
 						localStorage.setItem('map_zoom', map.zoom);
 						localStorage.setItem('map_type', map.getMapTypeId());
+						localStorage.setItem('currentCallsign', currentCallsign);
 					}
 				};
 				setInterval(this.loopFunction, 60000 * 2);
 			};
 			this.searchForCallsign = function (callsign) {
+				currentCallsign = callsign;
 				callsign = $.trim(callsign.toUpperCase());
 				for (var i = 0; i < markersArray.length; i++) {
 					if (markersArray[i].callsign === callsign) {
-						$(':focus').blur();
-						$("#searchrow").hide();
-						setTimeout(function () {
-							openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
-						}, 200);
+						openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
 						break;
 					}
 				}
@@ -265,7 +267,13 @@ if (typeof jQuery === "function") {
 					}
 				},
 				select : function (event, ui) {
-					app.searchForCallsign(ui.item.label);
+					setTimeout(function () {
+						document.activeElement.blur();
+						$('#cssearch').click();
+					}, 200);
+				},
+				focus : function (event, ui) {
+					return false;
 				}
 			});
 			app.loopFunction().then(function () {
@@ -275,7 +283,9 @@ if (typeof jQuery === "function") {
 				}
 			});
 			$("#cssearch").click(function () {
-				app.searchForCallsign($('#search').val());
+				setTimeout(function () {
+					app.searchForCallsign($('#search').val());
+				}, 200);
 			});
 		});
 	});
