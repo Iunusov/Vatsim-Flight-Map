@@ -248,7 +248,7 @@ if (typeof jQuery === "function") {
 						$("#searchrow").hide();
 						setTimeout(function () {
 							openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
-						}, 500);
+						}, 200);
 						break;
 					}
 				}
