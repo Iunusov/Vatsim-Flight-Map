@@ -271,9 +271,6 @@ if (typeof jQuery === "function") {
 						document.activeElement.blur();
 						$('#cssearch').click();
 					}, 200);
-				},
-				focus : function (event, ui) {
-					return false;
 				}
 			});
 			app.loopFunction().then(function () {
