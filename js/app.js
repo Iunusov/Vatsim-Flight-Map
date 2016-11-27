@@ -106,13 +106,9 @@ if (typeof jQuery === "function") {
 				title += "</table>";
 				title += "<br>";
 				title += "<a href=\"/?c=" + client.callsign + "\"" + " target=\"_blank\">Share link</a>";
-				return "<div class='info'>" + title + "</div>";
+				return "<div>" + title + "</div>";
 			}
 			var openInfoWindow = function (content, map, marker) {
-				$("#searchrow").hide();
-				setTimeout(function () {
-					$(':focus').blur();
-				}, 500);
 				if (window && window.history && window.history.pushState) {
 					var callSign = clients[marker.client_array_id].callsign;
 					var realName = clients[marker.client_array_id].realname;
@@ -173,6 +169,7 @@ if (typeof jQuery === "function") {
 									})
 									marker.setMap(map);
 								google.maps.event.addListener(marker, 'click', function () {
+									$("#searchrow").hide();
 									openInfoWindow(makeBoxInfo(client), map, marker);
 								});
 								markersArray.push(marker);
@@ -206,7 +203,7 @@ if (typeof jQuery === "function") {
 				map = new google.maps.Map(document.getElementById("map_canvas"), {
 						zoom : zoom,
 						center : defaultLocation,
-						disableDefaultUI: true,
+						disableDefaultUI : true,
 						mapTypeId : mapTypeId,
 						streetViewControl : false,
 						mapTypeControl : true,
@@ -247,7 +244,11 @@ if (typeof jQuery === "function") {
 				callsign = $.trim(callsign.toUpperCase());
 				for (var i = 0; i < markersArray.length; i++) {
 					if (markersArray[i].callsign === callsign) {
-						openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
+						$(':focus').blur();
+						$("#searchrow").hide();
+						setTimeout(function () {
+							openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
+						}, 500);
 						break;
 					}
 				}
