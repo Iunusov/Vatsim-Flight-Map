@@ -259,6 +259,11 @@ if (typeof jQuery === "function") {
 			app.initialize();
 			$("#search").autocomplete({
 				source : [],
+				open : function (result) {
+					if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
+						$('.ui-autocomplete').off('menufocus hover mouseover');
+					}
+				},
 				select : function (event, ui) {
 					app.searchForCallsign(ui.item.label);
 				}
