@@ -8,6 +8,8 @@ $arUrl = array(
 "http://vatsim-data.hardern.net/vatsim-data.txt"
 );
 
+require ("Airports.php");
+
 function loadServersArray(){
 	return json_decode(file_get_contents("./vatsim_servers.json"), true);
 }
@@ -65,11 +67,7 @@ function trytoparse($url){
                 "rating",
                 "protrevision",
                 "server",
-                "planned_destairport_lon",
-                "planned_destairport_lat",
                 "planned_revision",
-                "planned_depairport_lon",
-                "planned_depairport_lat",
                 "atis_message",
                 "planned_actdeptime"
             ))) {
@@ -82,6 +80,27 @@ function trytoparse($url){
         echo ("count(clients_final) = 0 ($url)" . PHP_EOL);
         return false;
     }
+	
+	//get planned_depairport_lat, planned_depairport_lon, planned_destairport_lat, planned_destairport_lon values from the database
+	$airports = new Airports();
+	foreach($clients_final as $k => $v){
+		$dep = false;
+		$dest = false;
+		if(array_key_exists("planned_depairport", $v) && strlen($v["planned_depairport"]) > 0){
+			$dep = $airports -> getAirportDetails($v["planned_depairport"]);
+		}
+		if(array_key_exists("planned_destairport", $v) && strlen($v["planned_destairport"]) > 0){
+			$dest= $airports -> getAirportDetails($v["planned_destairport"]);
+		}
+		if($dep){
+			$clients_final[$k]["planned_depairport_lat"] = $dep[6];
+			$clients_final[$k]["planned_depairport_lon"] = $dep[7];	
+		}
+		if($dest){
+			$clients_final[$k]["planned_destairport_lat"] = $dest[6];
+			$clients_final[$k]["planned_destairport_lon"] = $dest[7];
+		}
+	}
     
     $result_json = json_encode($clients_final);
     

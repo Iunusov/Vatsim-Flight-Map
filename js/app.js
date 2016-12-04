@@ -11,6 +11,7 @@ if (typeof jQuery === "function") {
 			var defaultLocation = null;
 			var mapTypeId = null;
 			var zoom = 3;
+			var polyLine = null;
 			this.getUrlParam = function (name, url) {
 				if (!url)
 					url = location.href;
@@ -109,6 +110,8 @@ if (typeof jQuery === "function") {
 				return "<div id='infoWindowContent'>" + title + "</div>";
 			}
 			var openInfoWindow = function (content, map, marker) {
+				if (polyLine)
+					polyLine.setMap(null);
 				if (window && window.history && window.history.pushState) {
 					var callSign = clients[marker.client_array_id].callsign;
 					var realName = clients[marker.client_array_id].realname;
@@ -121,6 +124,23 @@ if (typeof jQuery === "function") {
 				infowindow.vs_cid = clients[marker.client_array_id].cid;
 				infowindow.setContent(content);
 				infowindow.open(map, marker);
+
+				var cl = clients[marker.client_array_id];
+				if (cl.clienttype === "PILOT" && "planned_destairport_lat" in cl && cl.planned_destairport_lat != 0 && "planned_destairport_lon" in cl && cl.planned_destairport_lon != 0 && "planned_depairport_lat" in cl && cl.planned_depairport_lat != 0 && "planned_depairport_lon" in cl && cl.planned_depairport_lon != 0)
+					polyLine = new google.maps.Polyline({
+							path : [
+								new google.maps.LatLng(cl.planned_depairport_lat, cl.planned_depairport_lon),
+								new google.maps.LatLng(cl.latitude, cl.longitude),
+								new google.maps.LatLng(cl.planned_destairport_lat, cl.planned_destairport_lon),
+
+							],
+							strokeColor : "#FF0000",
+							strokeOpacity : 1.0,
+							strokeWeight : 3,
+							geodesic : true,
+							map : map
+						});
+
 				$("#searchrow").hide();
 				$("#infoWindowContent").parent().parent().css("max-height", "9999px");
 			};
@@ -185,6 +205,8 @@ if (typeof jQuery === "function") {
 				return dfd.promise();
 			};
 			var onCloseInfoWindow = function () {
+				if (polyLine)
+					polyLine.setMap(null);
 				$("#searchrow").show();
 				infowindow.vs_cid = -1;
 				for (var i = 0; i < tmpMarkersArray.length; i++) {
