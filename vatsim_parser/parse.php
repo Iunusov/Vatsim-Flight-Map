@@ -8,7 +8,7 @@ include("Airports.php");
 
 function toUTF8($str)
 {
-    return utf8_encode(str_replace(chr(0x5E) . chr(0xA7), PHP_EOL, $str));
+    return utf8_encode(str_replace(chr(0x5E) . chr(0xA7), PHP_EOL, utf8_decode($str)));
 }
 
 function fixArrayEncoding(&$arr)
@@ -63,7 +63,7 @@ function addToDB($arr)
 function trytoparse($url)
 {
     $clients_container = Array();
-    $data              = file_get_contents($url);
+    $data              = utf8_encode(file_get_contents($url));
     if (!$data) {
         error_log("file_get_contents($url) fails");
         return false;
@@ -97,6 +97,11 @@ function trytoparse($url)
     $tpl_array     = explode(":", trim($clients_tpl[1]));
     
     foreach ($clients as $key => $item) {
+		$keys_diff = substr_count($clients_tpl[1], ":") - substr_count($item, ":");
+		for($i=0; $i<$keys_diff; $i++){
+			error_log("cl_array was corrected!");
+			$item .= ":";
+		}
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
         $clients_final[$key] = array_combine($tpl_array, $cl_array);
