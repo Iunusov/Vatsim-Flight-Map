@@ -6,8 +6,6 @@
 ![Vatsim Flight Map (Mobile)](http://jsound.org/img/vatmap_mobile.jpg "Vatsim Flight Map (Mobile)")
 
 ## Dependencies
-[PHP-GD](http://php.net/manual/ru/book.image.php)
-
 [Memcache](http://php.net/manual/ru/book.memcache.php)
 
 [Bower](https://bower.io/)
@@ -22,7 +20,7 @@ sudo apt-get update
 ```
 
 ```
-sudo apt-get install nginx php-fpm memcached php-memcache php-gd  nodejs npm
+sudo apt-get install nginx php-fpm memcached php-memcache nodejs npm
 ```
 
 ```
@@ -78,11 +76,6 @@ cd vatsim_parser
 ./parse.php
 ```
 
-Generate plane images:
-```
-cd ../generators/plane_angles
-./generate.php
-```
 
 You probably might want to add these scripts to crontab:
 ```

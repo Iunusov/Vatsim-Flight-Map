@@ -9,7 +9,7 @@ if (!file_exists(TARGET_DIR)) {
     mkdir(TARGET_DIR, 0777, true);
 }
 
-for($angle = 0; $angle <= 360; $angle++){
+for($angle = 0; $angle <= 360; $angle+=10){
 	$rotation = imagerotate($source, $angle, imageColorAllocateAlpha($source, 0, 0, 0, 127));
 	imagealphablending($rotation, false);
 	imagesavealpha($rotation, true);

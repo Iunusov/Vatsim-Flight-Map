@@ -1,4 +1,2 @@
-img/planes
 *.log
 bower_components
-vatsim_parser/vatsim_servers.json

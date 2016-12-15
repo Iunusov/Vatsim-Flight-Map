@@ -12,6 +12,7 @@
     "bootstrap": "^3.3.x",
     "jquery-ui": "latest",
     "jquery": "latest",
-    "html5shiv": "latest"
+    "html5shiv": "latest",
+	"underscore": "latest"
   }
 }

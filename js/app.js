@@ -12,15 +12,7 @@ if (typeof jQuery === "function") {
 			var mapTypeId = null;
 			var zoom = 3;
 			var polyLine = null;
-			this.getUrlParam = function (name, url) {
-				if (!url)
-					url = location.href;
-				name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-				var regexS = "[\\?&]" + name + "=([^&#]*)";
-				var regex = new RegExp(regexS);
-				var results = regex.exec(url);
-				return results == null ? null : results[1];
-			}
+			var clientTemplate = null;
 			var getProp = function (obj, prop) {
 				if (prop in obj)
 					return obj[prop];
@@ -54,97 +46,82 @@ if (typeof jQuery === "function") {
 				}
 				return deptime.substring(0, 2) + ":" + deptime.substring(2, 4);
 			}
-			var tplPilot = function (client) {
-				return {
-					"Callsign" : getProp(client, "callsign"),
-					"Real Name" : getProp(client, "realname"),
-					"Flight Type" : getFlightType(getProp(client, "planned_flighttype")),
-					"Altitude" : formatNumber((getProp(client, "altitude"))) + " ft",
-					"Ground Speed" : getProp(client, "groundspeed") + " kts",
-					"Aircraft" : getProp(client, "planned_aircraft"),
-					"Tascruise" : getProp(client, "planned_tascruise") + " kts",
-					"Depairport" : getProp(client, "planned_depairport"),
-					"Planned Altitude" : getProp(client, "planned_altitude"),
-					"Destairport" : getProp(client, "planned_destairport"),
-					"Transponder" : getProp(client, "transponder"),
-					"Planned Deptime" : formatDepTime(client, "planned_deptime"),
-					"Altairport" : getProp(client, "planned_altairport"),
-					"Remarks" : "<details>" + getProp(client, "planned_remarks") + "</details>",
-					"Route" : "<details><code>" + getProp(client, "planned_route") + "</code></details>",
-					"Logon" : formatDate(client, "time_logon"),
-					"Heading" : getProp(client, "heading"),
-					"QNH,iHg" : getProp(client, "QNH_iHg"),
-					"QNH,Mb" : getProp(client, "QNH_Mb"),
-					"Fuel on Board" : getProp(client, "planned_hrsfuel") + "h " + getProp(client, "planned_minfuel") + "m",
-					"Enroute" : getProp(client, "planned_hrsenroute") + "h " + getProp(client, "planned_minenroute") + "m"
-				}
-			};
-			var tplATC = function (client) {
-				return {
-					"Callsign" : getProp(client, "callsign"),
-					"Real Name" : getProp(client, "realname"),
-					"Frequency" : getProp(client, "frequency"),
-					"Visual Range" : getProp(client, "visualrange"),
-					"Atis Received" : formatDate(client, "time_last_atis_received"),
-					"Logon" : formatDate(client, "time_logon"),
-				}
-			};
-			var makeBoxInfo = function (client) {
-				var obj = null;
+			var objectToHTML = function (client) {
+				client["altitude"] = formatNumber((getProp(client, "altitude")));
+				client["time_logon"] = formatDate(client, "time_logon");
 				if (client.clienttype === "PILOT") {
-					obj = tplPilot(client);
-				}
-				if (client.clienttype === "ATC") {
-					obj = tplATC(client);
-				}
-				var title = "<table>";
-				for (var key in obj) {
-					if (obj.hasOwnProperty(key) && typeof obj[key] != "undefined" && obj[key] !== "") {
-						title += "<tr><td>" + key + "</td><td><b>" + obj[key] + "</b></td></tr>";
+					client["planned_deptime"] = formatDepTime(client, "planned_deptime");
+				} else
+					if (client.clienttype === "ATC") {
+						client["time_last_atis_received"] = formatDate(client, "time_last_atis_received");
 					}
-				}
-				title += "<tr><td>" + "Past flights" + "</td><td><b>" + "<a href=\"http://vataware.com/pilot/" + client.cid + "\"" + " target=\"_blank\">Vataware</a>" + "</b></td></tr>";
-				title += "</table>";
-				title += "<br>";
-				title += "<a href=\"/?c=" + client.callsign + "\"" + " target=\"_blank\">Share link</a>";
-				return "<div id='infoWindowContent'>" + title + "</div>";
+				return clientTemplate({
+					client : client
+				});
 			}
-			var openInfoWindow = function (content, map, marker) {
+			var openInfoWindow = function (client, map, marker) {
 				if (polyLine)
 					polyLine.setMap(null);
 				if (window && window.history && window.history.pushState) {
-					var callSign = clients[marker.client_array_id].callsign;
-					var realName = clients[marker.client_array_id].realname;
-					if (callSign && realName) {
-						history.replaceState({}, realName, "?c=" + callSign);
-						document.title = realName;
+					var callSign = client.callsign;
+					if (callSign) {
+						history.replaceState({}, document.title, "?c=" + callSign);
 					}
 				}
 				infowindow.close();
-				infowindow.vs_cid = clients[marker.client_array_id].cid;
-				infowindow.setContent(content);
+				infowindow.vs_cid = client.cid;
+				infowindow.setContent(objectToHTML(client));
 				infowindow.open(map, marker);
-
-				var cl = clients[marker.client_array_id];
-				if (cl.clienttype === "PILOT" && "planned_destairport_lat" in cl && cl.planned_destairport_lat != 0 && "planned_destairport_lon" in cl && cl.planned_destairport_lon != 0 && "planned_depairport_lat" in cl && cl.planned_depairport_lat != 0 && "planned_depairport_lon" in cl && cl.planned_depairport_lon != 0)
+				if (client.clienttype === "PILOT" && "planned_destairport_lat" in client && client.planned_destairport_lat != 0 && "planned_destairport_lon" in client && client.planned_destairport_lon != 0 && "planned_depairport_lat" in client && client.planned_depairport_lat != 0 && "planned_depairport_lon" in client && client.planned_depairport_lon != 0)
 					polyLine = new google.maps.Polyline({
-							path : [
-								new google.maps.LatLng(cl.planned_depairport_lat, cl.planned_depairport_lon),
-								new google.maps.LatLng(cl.latitude, cl.longitude),
-								new google.maps.LatLng(cl.planned_destairport_lat, cl.planned_destairport_lon),
-
-							],
+							path : [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon), ],
 							strokeColor : "#FF0000",
-							strokeOpacity : 1.0,
-							strokeWeight : 3,
+							strokeOpacity : 0.8,
+							strokeWeight : 2,
 							geodesic : true,
 							map : map
 						});
-
 				$("#searchrow").hide();
 				$("#infoWindowContent").parent().parent().css("max-height", "9999px");
 			};
+			var requestClientDetails = function (cid, cb) {
+				$.ajax({
+					type : "GET",
+					url : "getcdetails.php",
+					data : {
+						cid : cid
+					},
+					contentType : "application/json",
+					dataType : "json",
+					success : function (data, textStatus, request) {
+						cb(data);
+					}
+				});
+			}
+			var onCloseInfoWindow = function () {
+				if (polyLine) {
+					polyLine.setMap(null);
+				}
+				$("#searchrow").show();
+				infowindow.vs_cid = -1;
+				for (var i = 0; i < tmpMarkersArray.length; i++) {
+					tmpMarkersArray[i].setMap(null);
+					delete tmpMarkersArray[i].vatsim_client_arr;
+				}
+				tmpMarkersArray = [];
+				history.replaceState({}, document.title, "/");
+			}
 			this.callSignsArray = [];
+			this.getUrlParam = function (name, url) {
+				if (!url) {
+					url = location.href;
+				}
+				name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+				var regexS = "[\\?&]" + name + "=([^&#]*)";
+				var regex = new RegExp(regexS);
+				var results = regex.exec(url);
+				return results == null ? null : results[1];
+			}
 			this.loopFunction = function () {
 				var dfd = $.Deferred();
 				var that = this;
@@ -156,42 +133,52 @@ if (typeof jQuery === "function") {
 					success : function (data, textStatus, request) {
 						var lm = request.getResponseHeader('Last-Modified');
 						if (lm != null && lm == lastModified) {
+							dfd.resolve();
 							return dfd.promise();
 						}
 						lastModified = lm;
 						for (var i = 0; i < markersArray.length; i++) {
-							if (infowindow.vs_cid === clients[markersArray[i].client_array_id].cid)
+							if (infowindow.vs_cid === markersArray[i].vatsim_client_arr[0]) {
 								tmpMarkersArray.push(markersArray[i]);
-							else
+							} else {
 								markersArray[i].setMap(null);
+								delete markersArray[i].vatsim_client_arr;
+							}
 							google.maps.event.clearInstanceListeners(markersArray[i]);
 						}
 						clients = data;
 						markersArray = [];
 						that.callSignsArray = [];
 						$.each(data, function (index, client) {
-							that.callSignsArray.push(client.callsign);
+							var cid = client[0];
+							var callsign = client[1];
+							var clienttype = client[2];
+							var heading = client[3];
+							var latitude = client[4];
+							var longitude = client[5];
+							that.callSignsArray.push(callsign);
 							var icon = "img/undefined.png";
-							if (!client.heading)
-								client.heading = 0;
-							if (client.clienttype === "PILOT") {
-								icon = "img/planes/" + (360 - Math.round(client.heading / 20) * 20) + ".png";
+							if (!heading)
+								heading = 0;
+							if (clienttype === "PILOT") {
+								icon = "img/planes/" + (360 - Math.round(heading / 20) * 20) + ".png";
 							}
-							if (client.clienttype === "ATC") {
+							if (clienttype === "ATC") {
 								icon = "img/control.png";
 							}
-							if (client.clienttype === "PILOT" || client.clienttype === "ATC") {
+							if (clienttype === "PILOT" || clienttype === "ATC") {
 								var marker = new google.maps.Marker({
-										position : new google.maps.LatLng(client.latitude, client.longitude),
+										position : new google.maps.LatLng(latitude, longitude),
 										map : map,
-										title : client.callsign,
+										title : callsign,
 										icon : icon,
-										callsign : client.callsign,
-										client_array_id : index
+										vatsim_client_arr : clients[index]
 									})
 									marker.setMap(map);
 								google.maps.event.addListener(marker, 'click', function () {
-									openInfoWindow(makeBoxInfo(client), map, marker);
+									requestClientDetails(cid, function (clientDetails) {
+										openInfoWindow(clientDetails, map, marker);
+									});
 								});
 								markersArray.push(marker);
 							}
@@ -204,18 +191,8 @@ if (typeof jQuery === "function") {
 				});
 				return dfd.promise();
 			};
-			var onCloseInfoWindow = function () {
-				if (polyLine)
-					polyLine.setMap(null);
-				$("#searchrow").show();
-				infowindow.vs_cid = -1;
-				for (var i = 0; i < tmpMarkersArray.length; i++) {
-					tmpMarkersArray[i].setMap(null);
-				}
-				tmpMarkersArray = [];
-				history.replaceState({}, "state", "/");
-			}
 			this.initialize = function () {
+				clientTemplate = _.template($("#clientTemplate").html());
 				defaultLocation = new google.maps.LatLng(44.996883999209636, -18.800782187499979);
 				mapTypeId = google.maps.MapTypeId.TERRAIN;
 				if (('localStorage' in window) && window['localStorage'] != null) {
@@ -233,9 +210,7 @@ if (typeof jQuery === "function") {
 						$("#search").val(currentCallsign);
 					}
 				}
-				infowindow = new google.maps.InfoWindow({
-						maxWidth : 400
-					});
+				infowindow = new google.maps.InfoWindow({});
 				map = new google.maps.Map(document.getElementById("map_canvas"), {
 						zoom : zoom,
 						center : defaultLocation,
@@ -270,8 +245,12 @@ if (typeof jQuery === "function") {
 			this.searchForCallsign = function (callsign) {
 				callsign = $.trim(callsign.toUpperCase());
 				for (var i = 0; i < markersArray.length; i++) {
-					if (markersArray[i].callsign === callsign) {
-						openInfoWindow(makeBoxInfo(clients[markersArray[i].client_array_id]), map, markersArray[i]);
+					var current_calsign = markersArray[i].vatsim_client_arr[1];
+					var current_cid = markersArray[i].vatsim_client_arr[0];
+					if (current_calsign === callsign) {
+						requestClientDetails(current_cid, function (clientDetails) {
+							openInfoWindow(clientDetails, map, markersArray[i]);
+						});
 						break;
 					}
 				}

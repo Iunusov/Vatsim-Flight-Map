@@ -32,11 +32,83 @@ body {
 	left:0;
 }
 .ui-autocomplete { height: 400px; overflow-y: scroll; overflow-x: hidden;}
-strong, b {
-    font-weight: bold;
-}
 </style>
 <base target="_blank" />
+
+
+<script type="underscore-template" id='clientTemplate'>
+<a href="http://vataware.com/pilot/<%- client.cid %>"><h5><%- client.callsign %> (<%- client.realname %>) </h5></a>
+<p><em>Logon: <%- client.time_logon %> UTC</em></p>
+<table class="table-responsive table-striped" style="border-collapse: separate;border-spacing: 2px 2px;">
+<% if (client.clienttype === "PILOT") { %>
+<% if(client.planned_depairport && client.planned_destairport) { %>
+<tr>
+<td>Path: </td>
+<td class="text-nowrap"><strong><%- client.planned_depairport %> <span class="glyphicon glyphicon-arrow-right"></span> <%- client.planned_destairport %> <% if(client.planned_altairport){ %><span class="text-muted">(alt: <%- client.planned_altairport %>)</span><% } %></strong></td>
+</tr>
+<% } %>
+<tr>
+<td>Aircraft: </td>
+<td class="text-nowrap"><strong><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></strong></td>
+</tr>
+<tr>
+<td>Altitude: </td>
+<td class="text-nowrap"><strong><%- client.altitude %> ft<% if(client.planned_altitude) {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></strong></td>
+</tr>
+<tr>
+<td>Speed: </td>
+<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise) {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
+</tr>
+<tr>
+<td>Heading: </td>
+<td><strong><%- client.heading %></strong></td>
+</tr>
+<tr>
+<td>QNH: </td>
+<td class="text-nowrap"><strong><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></strong></td>
+</tr>
+<% if(client.planned_hrsenroute && client.planned_minenroute) {%>
+<tr>
+<td>Enroute: </td>
+<td class="text-nowrap"><strong><%- client.planned_hrsenroute %>h <%- client.planned_minenroute %>m<% if(client.planned_hrsfuel && client.planned_minfuel) {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel %>h <%- client.planned_minfuel %>m)</span><% } %></strong></td>
+</tr>
+<% } %>
+<tr>
+<td>Deptime: </td>
+<td><strong><%- client.planned_deptime %> UTC</strong></td>
+</tr>
+<% if(client.planned_remarks){ %>
+<tr><td  colspan="2"><details><summary>Remarks</summary><code><%- client.planned_remarks %></code></details></td></tr>
+<% } %>
+<% if(client.planned_route){ %>
+<tr><td  colspan="2"><details><summary>Route</summary><code><%- client.planned_route %></code></details></td></tr>
+<% } %>
+<% } %>
+<% if (client.clienttype === "ATC") { %>
+<tr>
+<td class="text-nowrap">Frequency: </td>
+<td class="text-nowrap"><strong><%- client.frequency %></strong></td>
+</tr>
+<tr>
+<td class="text-nowrap">Visual Range: </td>
+<td class="text-nowrap"><strong><%- client.visualrange %></strong></td>
+</tr>
+<tr>
+<td class="text-nowrap">ATIS received: </td>
+<td class="text-nowrap"><strong><%- client.time_last_atis_received %> UTC</strong></td>
+</tr>
+<% if(client.atis_message){ %>
+<tr><td  colspan="2"><details open="open"><summary>ATIS message</summary><pre><%- client.atis_message %>
+</pre>
+</details></td></tr>
+<% } %>
+<% } %>
+</table>
+<hr>
+<p><a href="?c=<%- client.callsign %>" target="_blank"><button type="button" class="btn btn-sm btn-info">Share Link</button></a> </p>
+</script>
+
+
 </head>
 <body>
 <nav id="searchrow" class="navbar-fixed-top">
@@ -54,9 +126,11 @@ strong, b {
 </div>
 </nav>
 <div id="map_canvas"></div>
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js"></script>
+<!--get YOUR_API_KEY from: https://developers.google.com/maps/documentation/javascript/get-api-key -->
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script src="bower_components/underscore/underscore-min.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
 </body>
 </html>
