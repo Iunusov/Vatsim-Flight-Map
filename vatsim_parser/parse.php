@@ -6,6 +6,45 @@ ini_set('display_errors', 1);
 include("config.php");
 include("Airports.php");
 
+function parseCreatedTimeStamp($str)
+{
+    if (!is_string($str)) {
+        error_log('parseCreatedTimeStamp(): str is not string!');
+        return false;
+    }
+    $res = preg_match('/; Created at (\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})/', $str, $created);
+    if (!$res || !is_array($created) || count($created) != 7) {
+        error_log('preg_match() failed!');
+        return false;
+    }
+    try {
+        $obj = DateTime::createFromFormat("d/m/Y H:i:s", "{$created[1]}/{$created[2]}/{$created[3]} {$created[4]}:{$created[5]}:{$created[6]}", new DateTimeZone('UTC'));
+        
+        if (!$obj) {
+            error_log('createFromFormat() failed!');
+            return false;
+        }
+        return $obj->getTimestamp();
+    }
+    catch (Exception $e) {
+        error_log($e->getMessage());
+        return false;
+    }
+}
+
+function getCreatedTimeStampFromMemCache()
+{
+    $m = new Memcache;
+    $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
+    $clients_data = $m->get("vatmap_clients_data");
+    $m->close();
+    if (!$clients_data) {
+        error_log('failed to get clients_data from memcache');
+        return false;
+    }
+    return $clients_data['vatsim_data_created_timestamp'];
+}
+
 function toUTF8($str)
 {
     return utf8_encode(str_replace(chr(0x5E) . chr(0xA7), PHP_EOL, utf8_decode($str)));
@@ -23,7 +62,7 @@ function loadServersArray()
     return json_decode(file_get_contents("./vatsim_servers.json"), true);
 }
 
-function addToDB($arr)
+function addToDB($arr, $timestamp)
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
@@ -42,7 +81,7 @@ function addToDB($arr)
             $v["atis_message"]
         );
         
-        $m->set("vatmap_client" . $v["cid"], json_encode($v), 0, 60 * 30); //30 min expiration
+        $m->set("vatmap_client" . $v["cid"], json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);
@@ -52,12 +91,16 @@ function addToDB($arr)
     if (json_last_error() != JSON_ERROR_NONE) {
         error_log("json_last_error(): " . json_last_error());
     }
-    $m->set("vatmap_clients_data", array(
+    $res = $m->set("vatmap_clients_data", array(
         'vatmap_clients_json' => $json,
         'vatmap_clients_json_md5' => md5($json),
-        'vatmap_clients_json_last_modified' => time()
+        'vatmap_clients_json_last_modified' => time(),
+        'vatsim_data_created_timestamp' => $timestamp
     ));
     $m->close();
+    if (!$res) {
+        error_log('failed to save data to memcache!');
+    }
 }
 
 function trytoparse($url)
@@ -75,7 +118,20 @@ function trytoparse($url)
         error_log("cannot parse data");
         return false;
     }
-    $clients = "";
+    $clients   = "";
+    $timestamp = parseCreatedTimeStamp($data);
+    if (!$timestamp) {
+        error_log('parseCreatedTimeStamp() fails.');
+        return false;
+    }
+    $timestamp_from_memcache = getCreatedTimeStampFromMemCache();
+    if (!$timestamp_from_memcache) {
+        error_log('no timestamp from memcache, skip checking.');
+    }
+    if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache)) {
+        error_log('old data, skip');
+        return false;
+    }
     
     preg_match_all("/(.*):" . PHP_EOL . "/", $clients_container[1], $clients);
     
@@ -97,11 +153,11 @@ function trytoparse($url)
     $tpl_array     = explode(":", trim($clients_tpl[1]));
     
     foreach ($clients as $key => $item) {
-		$keys_diff = substr_count($clients_tpl[1], ":") - substr_count($item, ":");
-		for($i=0; $i<$keys_diff; $i++){
-			error_log("cl_array was corrected!");
-			$item .= ":";
-		}
+        $keys_diff = substr_count($clients_tpl[1], ":") - substr_count($item, ":");
+        for ($i = 0; $i < $keys_diff; $i++) {
+            error_log("cl_array was corrected!");
+            $item .= ":";
+        }
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
         $clients_final[$key] = array_combine($tpl_array, $cl_array);
@@ -128,7 +184,7 @@ function trytoparse($url)
         }
     }
     
-    addToDB($clients_final);
+    addToDB($clients_final, $timestamp);
     
     return true;
 }

@@ -95,6 +95,11 @@ if (typeof jQuery === "function") {
 					dataType : "json",
 					success : function (data, textStatus, request) {
 						cb(data);
+					},
+					error : function (xhr, ajaxOptions, thrownError) {
+						if (xhr.status == 404) {
+							window.location.reload(true);
+						}
 					}
 				});
 			}
