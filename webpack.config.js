@@ -1,5 +1,4 @@
 var webpack = require('webpack');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
 	module : {
@@ -23,7 +22,7 @@ module.exports = {
 	},
 	entry : {
 		app : ['./js/main.js', './prod.js'],
-		vendor : ['jquery', 'jquery-ui/ui/widgets/autocomplete', 'google-maps', 'underscore', 'bootstrap', 'bootstrap/dist/css/bootstrap.css', 'jquery-ui/themes/base/autocomplete.css', 'jquery-ui/themes/base/core.css', 'jquery-ui/themes/base/menu.css', 'jquery-ui/themes/base/theme.css']
+		vendor : ['jquery', 'jquery-ui/ui/widgets/autocomplete', 'underscore', 'bootstrap', 'bootstrap/dist/css/bootstrap.css', 'jquery-ui/themes/base/autocomplete.css', 'jquery-ui/themes/base/core.css', 'jquery-ui/themes/base/menu.css', 'jquery-ui/themes/base/theme.css']
 	},
 	output : {
 		path : 'dist/',

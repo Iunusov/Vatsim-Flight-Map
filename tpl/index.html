@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vatsim Flight Map</title>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" /><![endif]-->
+<!--[if lt IE 9]>
+  <script src="js/html5shiv.js"></script>
+<![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Vatsim aircrafts and ATC on the Google Maps. Updated every 2 min.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" sizes="192x192" href="icon.png">
+<style type="text/css">
+html { 
+	height: 100% 
+}
+body { 
+	height: 100%; 
+	margin: 0; 
+	padding: 0;
+	overflow-x: hidden; 
+}
+#map_canvas { 
+	height: 100%;
+	width:100%;
+	position:absolute;
+	top:0;
+	left:0;
+}
+.ui-autocomplete { height: 400px; overflow-y: scroll; overflow-x: hidden;}
+</style>
+<base target="_blank" />
+</head>
+<body>
+<nav id="searchrow" class="navbar-fixed-top">
+<div class="container">
+<div id="searchrow" class="row" style="padding:5px">
+  <div class="col-xs-8 col-sm-4 pull-right">
+    <div class="input-group">
+      <input id="search" type="text" class="form-control" placeholder="callsign" onkeydown="if(event.keyCode == 13) $('#cssearch').click();" >
+      <span class="input-group-btn">
+        <button id="cssearch" class="btn btn-primary" type="button">Search</button>
+      </span>
+    </div>
+  </div>
+</div>
+</div>
+</nav>
+<div id="map_canvas">
+</div>
+</body>
+</html>

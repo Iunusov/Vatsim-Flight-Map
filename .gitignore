@@ -1,5 +1,5 @@
 *.log
-bower_components
-node_modules
-index.html
-dist
+/bower_components
+/node_modules
+/index.html
+/dist
