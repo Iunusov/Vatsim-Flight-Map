@@ -3,33 +3,54 @@
 
 ![Vatsim Flight Map](http://jsound.org/img/vatmap.png "Vatsim Flight Map")
 
-![Vatsim Flight Map (Mobile)](http://jsound.org/img/vatmap_mobile.jpg "Vatsim Flight Map (Mobile)")
-
-## Dependencies
+## Used tools
 [Memcache](http://php.net/manual/ru/book.memcache.php)
+[Webpack](https://webpack.github.io/docs/tutorials/getting-started/)
 
-[Bower](https://bower.io/)
-
-## Installation
-
-The following guide is for Ubuntu 16.04.
-
-Install the required packages:
+## Prerequisites: Frontend
 ```
 sudo apt-get update
 ```
 
 ```
-sudo apt-get install nginx php-fpm memcached php-memcache nodejs npm
+sudo apt-get nodejs npm
 ```
 
 ```
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 ```
 
-install bower:
 ```
-sudo npm install bower -g
+npm install webpack -g
+```
+
+## Clonning a repo
+
+```
+git clone https://github.com/Iunusov/Vatsim-Flight-Map
+cd Vatsim-Flight-Map
+```
+
+## Build
+
+```
+npm install
+webpack
+```
+
+production (with minification):
+
+```
+webpack -p
+```
+
+## Prerequisites: Backend
+
+The following guide is for Ubuntu 16.04.
+
+Install the required packages:
+```
+sudo apt-get install nginx php-fpm memcached php-memcache php7.0-xml
 ```
 
 Enable php support in nginx:
@@ -59,23 +80,12 @@ cd /var/www/html
 sudo chmod 757 .
 ```
 
-```
-git clone https://github.com/Iunusov/Vatsim-Flight-Map
-cd Vatsim-Flight-Map
-```
-
-Install javascript dependencies:
-```
-bower install
-```
-
 Parse some data (for testing):
 ```
 cd vatsim_parser
 ./get_servers.php
 ./parse.php
 ```
-
 
 You probably might want to add these scripts to crontab:
 ```
@@ -88,14 +98,13 @@ You probably might want to add these scripts to crontab:
 **get_servers.php** is for parsing Vatsim servers list (can be runned daily)
 
 Request API key for Google Maps:
-https://developers.google.com/maps/documentation/javascript/get-api-key (and edit index.html accordingly)
+https://developers.google.com/maps/documentation/javascript/get-api-key
 
-otherwise, you will get the MissingKeyMapError
+after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-Flight-Map/blob/master/prod.js) file.
 
 Open url in your browser:
-```
+
 http://localhost/Vatsim-Flight-Map
-```
 
 ## License
 
