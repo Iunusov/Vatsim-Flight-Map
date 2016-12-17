@@ -5,6 +5,7 @@
 
 ## Used tools
 [Memcache](http://php.net/manual/ru/book.memcache.php)
+
 [Webpack](https://webpack.github.io/docs/tutorials/getting-started/)
 
 ## Prerequisites: Frontend
@@ -13,7 +14,7 @@ sudo apt-get update
 ```
 
 ```
-sudo apt-get nodejs npm
+sudo apt-get install nodejs npm
 ```
 
 ```
@@ -21,7 +22,7 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 ```
 
 ```
-npm install webpack -g
+sudo npm install webpack -g
 ```
 
 ## Clonning a repo
@@ -38,7 +39,7 @@ npm install
 webpack
 ```
 
-production (with minification):
+production build (with optimizations and minifications):
 
 ```
 webpack -p
@@ -104,7 +105,7 @@ after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-
 
 Open url in your browser:
 
-http://localhost/Vatsim-Flight-Map
+[localhost/Vatsim-Flight-Map](http://localhost/Vatsim-Flight-Map)
 
 ## License
 
