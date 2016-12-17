@@ -45,9 +45,28 @@ function getCreatedTimeStampFromMemCache()
     return $clients_data['vatsim_data_created_timestamp'];
 }
 
+function detect_encoding($string)
+{
+    static $list = array('utf-8', 'windows-1251');
+    
+    foreach ($list as $item) {
+        $sample = @iconv($item, $item, $string);
+        if (md5($sample) == md5($string))
+            return $item;
+    }
+    return false;
+}
+
 function toUTF8($str)
 {
-    return utf8_encode(str_replace(chr(0x5E) . chr(0xA7), PHP_EOL, utf8_decode($str)));
+    $resultUTF8 = "";
+    $enc        = detect_encoding($str);
+    if ($enc) {
+        $resultUTF8 = iconv($enc, 'utf-8', $str);
+    } else {
+        $resultUTF8 = utf8_encode($str);
+    }
+    return str_replace(utf8_encode(chr(0x5E) . chr(0xA7)), PHP_EOL, $resultUTF8);
 }
 
 function fixArrayEncoding(&$arr)
@@ -106,7 +125,7 @@ function addToDB($arr, $timestamp)
 function trytoparse($url)
 {
     $clients_container = Array();
-    $data              = utf8_encode(file_get_contents($url));
+    $data              = file_get_contents($url);
     if (!$data) {
         error_log("file_get_contents($url) fails");
         return false;
@@ -130,7 +149,7 @@ function trytoparse($url)
     }
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache)) {
         error_log('old data, skip');
-        return false;
+        //return false;
     }
     
     preg_match_all("/(.*):" . PHP_EOL . "/", $clients_container[1], $clients);
@@ -161,11 +180,20 @@ function trytoparse($url)
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
         $clients_final[$key] = array_combine($tpl_array, $cl_array);
+        if (!is_array($clients_final[$key])) {
+            error_log("array_combine() failed!");
+            error_log("count(tpl_array): " . count($tpl_array));
+            error_log("count(cl_array): " . count($cl_array));
+        }
     }
     
     //get planned_depairport_lat, planned_depairport_lon, planned_destairport_lat, planned_destairport_lon values from the database
     $airports = new Airports();
     foreach ($clients_final as $k => $v) {
+        if (!is_array($v)) {
+            error_log("not an array!");
+            continue;
+        }
         $dep  = false;
         $dest = false;
         if (array_key_exists("planned_depairport", $v) && strlen($v["planned_depairport"]) > 0) {

@@ -245,7 +245,7 @@ if (typeof jQuery === "function") {
 						localStorage.setItem('currentCallsign', $("#search").val());
 					}
 				};
-				setInterval(this.loopFunction, 60000 * 2);
+				setInterval(this.loopFunction, 60000);
 			};
 			this.searchForCallsign = function (callsign) {
 				callsign = $.trim(callsign.toUpperCase());
