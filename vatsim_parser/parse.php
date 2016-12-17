@@ -149,7 +149,7 @@ function trytoparse($url)
     }
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache)) {
         error_log('old data, skip');
-        //return false;
+        return false;
     }
     
     preg_match_all("/(.*):" . PHP_EOL . "/", $clients_container[1], $clients);
