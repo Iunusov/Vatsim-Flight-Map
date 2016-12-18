@@ -45,23 +45,13 @@ function getCreatedTimeStampFromMemCache()
     return $clients_data['vatsim_data_created_timestamp'];
 }
 
-function detect_encoding($string)
-{
-    static $list = array('utf-8', 'windows-1251');
-    
-    foreach ($list as $item) {
-        $sample = @iconv($item, $item, $string);
-        if (md5($sample) == md5($string))
-            return $item;
-    }
-    return false;
-}
-
 function toUTF8($str)
 {
-
-	$resultUTF8 = mb_convert_encoding($str, "UTF-8", "ISO-8859-1, windows-1251");
-	
+    if (!((bool) preg_match('//u', $str))) {
+        $resultUTF8 = utf8_encode($str);
+    } else {
+        $resultUTF8 = $str;
+    }
     return str_replace(utf8_encode(chr(0x5E) . chr(0xA7)), PHP_EOL, $resultUTF8);
 }
 
