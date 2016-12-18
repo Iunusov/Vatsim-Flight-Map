@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Iunusov/Vatsim-Flight-Map.svg?branch=master)](https://travis-ci.org/Iunusov/Vatsim-Flight-Map)
+
 # Vatsim Flight Map
 [Vatsim](https://wikipedia.org/wiki/VATSIM) aircrafts and ATC on Google Maps.
 

@@ -2,6 +2,7 @@
 var App = require("./App.js");
 if (typeof jQuery === "function") {
 	jQuery(function ($) {
+		$("#searchrow").removeClass("hidden");
 		window.googleMapsLoaded = function () {
 			var app = new App();
 			app.initialize();
