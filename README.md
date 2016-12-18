@@ -59,7 +59,7 @@ The following guide is for Ubuntu 16.04.
 
 Install the required packages:
 ```
-sudo apt-get install nginx php-fpm memcached php-memcache php7.0-xml
+sudo apt-get install nginx php-fpm memcached php-memcache php7.0-xml php-mbstring
 ```
 
 Enable php support in nginx:
