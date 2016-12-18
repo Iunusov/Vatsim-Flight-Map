@@ -20,11 +20,14 @@ if (typeof jQuery === "function") {
 					}, 200);
 				}
 			});
-			app.loopFunction().then(function () {
+			app.doPoll().then(function () {
 				var callSign = app.getUrlParam("c", document.URL);
 				if (callSign) {
 					app.searchForCallsign(callSign);
 				}
+			});
+			$(window).focus(function () {
+				app.doPoll();
 			});
 			$("#cssearch").click(function () {
 				setTimeout(function () {

@@ -1,4 +1,6 @@
 var App = function () {
+	var that = this;
+	var pTimeout = false;
 	var lastModified = null;
 	var map = null;
 	var markersArray = [];
@@ -124,9 +126,8 @@ var App = function () {
 		var results = regex.exec(url);
 		return results == null ? null : results[1];
 	}
-	this.loopFunction = function () {
+	this.getClientsFromServer = function () {
 		var dfd = $.Deferred();
-		var that = this;
 		$.ajax({
 			type : "GET",
 			url : "getclients.php",
@@ -193,6 +194,15 @@ var App = function () {
 		});
 		return dfd.promise();
 	};
+	this.doPoll = function () {
+		if (pTimeout) {
+			clearTimeout(pTimeout);
+			pTimeout = false;
+		}
+		var res = that.getClientsFromServer();
+		pTimeout = setTimeout(that.doPoll, 60000);
+		return res;
+	}
 	this.initialize = function () {
 		clientTemplate = _.template(require("raw-loader!../tpl/details.html"));
 		defaultLocation = new google.maps.LatLng(44.996883999209636, -18.800782187499979);
@@ -242,7 +252,6 @@ var App = function () {
 				localStorage.setItem('currentCallsign', $("#search").val());
 			}
 		};
-		setInterval(this.loopFunction, 60000 * 2);
 	};
 	this.searchForCallsign = function (callsign) {
 		callsign = $.trim(callsign.toUpperCase());
