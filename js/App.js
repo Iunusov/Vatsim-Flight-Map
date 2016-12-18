@@ -186,7 +186,7 @@ var App = function () {
 						markersArray.push(marker);
 					}
 				});
-				$('#search').autocomplete("option", {
+				$('#inputCallsign').autocomplete("option", {
 					source : that.callSignsArray
 				});
 				dfd.resolve();
@@ -219,7 +219,7 @@ var App = function () {
 			}
 			var currentCallsign = localStorage.getItem('currentCallsign');
 			if (currentCallsign) {
-				$("#search").val(currentCallsign);
+				$("#inputCallsign").val(currentCallsign);
 			}
 		}
 		infowindow = new google.maps.InfoWindow({});
@@ -249,7 +249,7 @@ var App = function () {
 				localStorage.setItem('map_center_lng', map.getCenter().lng());
 				localStorage.setItem('map_zoom', map.zoom);
 				localStorage.setItem('map_type', map.getMapTypeId());
-				localStorage.setItem('currentCallsign', $("#search").val());
+				localStorage.setItem('currentCallsign', $("#inputCallsign").val());
 			}
 		};
 	};

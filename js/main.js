@@ -6,7 +6,7 @@ if (typeof jQuery === "function") {
 		window.googleMapsLoaded = function () {
 			var app = new App();
 			app.initialize();
-			$("#search").autocomplete({
+			$("#inputCallsign").autocomplete({
 				source : [],
 				open : function (result) {
 					if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
@@ -16,7 +16,7 @@ if (typeof jQuery === "function") {
 				select : function (event, ui) {
 					setTimeout(function () {
 						document.activeElement.blur();
-						$('#cssearch').click();
+						$('#buttonCallsign').click();
 					}, 200);
 				}
 			});
@@ -29,10 +29,16 @@ if (typeof jQuery === "function") {
 			$(window).focus(function () {
 				app.doPoll();
 			});
-			$("#cssearch").click(function () {
+			$("#buttonCallsign").click(function () {
 				setTimeout(function () {
-					app.searchForCallsign($('#search').val());
+					app.searchForCallsign($('#inputCallsign').val());
 				}, 200);
+			});
+			$("#inputCallsign").keypress(function (e) {
+				if (e.which == 13) {
+					$("#buttonCallsign").click();
+					return false;
+				}
 			});
 		};
 		if (!window.GOOGLE_MAPS_API_KEY || window.GOOGLE_MAPS_API_KEY === "your_key_here") {
