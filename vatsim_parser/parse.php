@@ -59,13 +59,9 @@ function detect_encoding($string)
 
 function toUTF8($str)
 {
-    $resultUTF8 = "";
-    $enc        = detect_encoding($str);
-    if ($enc) {
-        $resultUTF8 = iconv($enc, 'utf-8', $str);
-    } else {
-        $resultUTF8 = utf8_encode($str);
-    }
+
+	$resultUTF8 = mb_convert_encoding($str, "UTF-8", "ISO-8859-1, windows-1251");
+	
     return str_replace(utf8_encode(chr(0x5E) . chr(0xA7)), PHP_EOL, $resultUTF8);
 }
 
