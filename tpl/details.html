@@ -18,7 +18,7 @@
 </tr>
 <tr>
 <td>Speed: </td>
-<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise) {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
+<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise != 0) {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
 </tr>
 <tr>
 <td>Heading: </td>
@@ -28,16 +28,18 @@
 <td>QNH: </td>
 <td class="text-nowrap"><strong><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></strong></td>
 </tr>
-<% if(client.planned_hrsenroute && client.planned_minenroute) {%>
+<% if(client.planned_hrsenroute != 0 && client.planned_minenroute != 0) {%>
 <tr>
 <td>Enroute: </td>
 <td class="text-nowrap"><strong><%- client.planned_hrsenroute %>h <%- client.planned_minenroute %>m<% if(client.planned_hrsfuel && client.planned_minfuel) {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel %>h <%- client.planned_minfuel %>m)</span><% } %></strong></td>
 </tr>
 <% } %>
 <tr>
+<% if(client.planned_deptime){ %>
 <td>Deptime: </td>
 <td><strong><%- client.planned_deptime %> UTC</strong></td>
 </tr>
+<% } %>
 <% if(client.planned_remarks){ %>
 <tr><td  colspan="2"><details><summary>Remarks</summary><code><%- client.planned_remarks %></code></details></td></tr>
 <% } %>

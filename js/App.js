@@ -39,7 +39,10 @@ var App = function () {
 		return "0";
 	}
 	var formatDepTime = function (obj, prop) {
-		var deptime = getProp(obj, "planned_deptime");
+		var deptime = getProp(obj, prop);
+		if(deptime === "" || deptime === "0"){
+			return "";
+		}
 		while (deptime.length < 4) {
 			deptime = "0" + deptime;
 		}
@@ -50,6 +53,7 @@ var App = function () {
 		client["time_logon"] = formatDate(client, "time_logon");
 		if (client.clienttype === "PILOT") {
 			client["planned_deptime"] = formatDepTime(client, "planned_deptime");
+			client["planned_actdeptime"] = formatDepTime(client, "planned_actdeptime");
 		} else
 			if (client.clienttype === "ATC") {
 				client["time_last_atis_received"] = formatDate(client, "time_last_atis_received");
