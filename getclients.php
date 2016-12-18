@@ -20,6 +20,7 @@ if (@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $last_modified_time || @tr
     exit;
 }
 header('Content-type: application/json');
+header("Content-length: " . strlen($vatmap_clients_data['vatmap_clients_json']));
 header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', $last_modified_time + 60));
 echo $vatmap_clients_data['vatmap_clients_json'];
 ?>

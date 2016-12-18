@@ -42,5 +42,6 @@ if (!$details) {
     exit404();
 }
 
+header("Content-length: " . strlen($details));
 echo $details;
 ?>
