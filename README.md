@@ -3,7 +3,7 @@
 # Vatsim Flight Map
 [Vatsim](https://wikipedia.org/wiki/VATSIM) aircrafts and ATC on Google Maps.
 
-![Vatsim Flight Map](http://jsound.org/img/vatmap.png "Vatsim Flight Map")
+![Vatsim Flight Map](https://raw.githubusercontent.com/Iunusov/Vatsim-Flight-Map/master/img/mobileview.png "Vatsim Flight Map")
 
 ## Used tools
 [Memcache](http://php.net/manual/ru/book.memcache.php)
