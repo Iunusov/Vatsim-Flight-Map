@@ -87,12 +87,13 @@ var App = function () {
 		$("#searchrow").hide();
 		$("#infoWindowContent").parent().parent().css("max-height", "9999px");
 	};
-	var requestClientDetails = function (cid, cb) {
+	var requestClientDetails = function (cid, callsign, cb) {
 		$.ajax({
 			type : "GET",
 			url : "getcdetails.php",
 			data : {
-				cid : cid
+				cid : cid,
+				callsign : callsign
 			},
 			contentType : "application/json",
 			dataType : "json",
@@ -183,7 +184,7 @@ var App = function () {
 							})
 							marker.setMap(map);
 						google.maps.event.addListener(marker, 'click', function () {
-							requestClientDetails(cid, function (clientDetails) {
+							requestClientDetails(cid, callsign, function (clientDetails) {
 								openInfoWindow(clientDetails, map, marker);
 							});
 						});
@@ -263,7 +264,7 @@ var App = function () {
 			var current_calsign = markersArray[i].vatsim_client_arr[1];
 			var current_cid = markersArray[i].vatsim_client_arr[0];
 			if (current_calsign === callsign) {
-				requestClientDetails(current_cid, function (clientDetails) {
+				requestClientDetails(current_cid, callsign, function (clientDetails) {
 					openInfoWindow(clientDetails, map, markersArray[i]);
 				});
 				break;

@@ -36,13 +36,13 @@ function getCreatedTimeStampFromMemCache()
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-    $clients_data = $m->get("vatmap_clients_data");
+    $clients_data = $m->get(md5(MEMCACHE_PREFIX_VATSIM."clients_data"));
     $m->close();
     if (!$clients_data) {
         error_log('failed to get clients_data from memcache');
         return false;
     }
-    return $clients_data['vatsim_data_created_timestamp'];
+    return $clients_data['created_timestamp'];
 }
 
 function toUTF8($str)
@@ -71,12 +71,12 @@ function addToDB($arr, $timestamp)
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-    $vatmap_clients_data = array();
+    $clients = array();
     foreach ($arr as $v) {
         if ($v["clienttype"] != "ATC" && $v["clienttype"] != "PILOT") {
             continue;
         }
-        $vatmap_clients_data[] = array(
+        $clients[] = array(
             $v["cid"],
             $v["callsign"],
             $v["clienttype"],
@@ -86,21 +86,21 @@ function addToDB($arr, $timestamp)
             $v["atis_message"]
         );
         
-        $m->set("vatmap_client" . $v["cid"], json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
+        $m->set(md5(MEMCACHE_PREFIX_VATSIM . $v["cid"].$v["callsign"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);
         }
     }
-    $json = json_encode($vatmap_clients_data);
+    $json = json_encode($clients);
     if (json_last_error() != JSON_ERROR_NONE) {
         error_log("json_last_error(): " . json_last_error());
     }
-    $res = $m->set("vatmap_clients_data", array(
-        'vatmap_clients_json' => $json,
-        'vatmap_clients_json_md5' => md5($json),
-        'vatmap_clients_json_last_modified' => time(),
-        'vatsim_data_created_timestamp' => $timestamp
+    $res = $m->set(md5(MEMCACHE_PREFIX_VATSIM."clients_data"), array(
+        'json' => $json,
+        'md5' => md5($json),
+        'last_modified' => time(),
+        'created_timestamp' => $timestamp
     ));
     $m->close();
     if (!$res) {

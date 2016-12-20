@@ -2,15 +2,15 @@
 require("vatsim_parser/config.php");
 $m = new Memcache;
 $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-$vatmap_clients_data = $m->get("vatmap_clients_data");
+$clients = $m->get(md5(MEMCACHE_PREFIX_VATSIM."clients_data"));
 $m->close();
-if (!$vatmap_clients_data) {
+if (!$clients) {
     header("HTTP/1.0 404 Not Found");
     die();
 }
 
-$last_modified_time = $vatmap_clients_data['vatmap_clients_json_last_modified'];
-$etag  = $vatmap_clients_data['vatmap_clients_json_md5'];
+$last_modified_time = $clients['last_modified'];
+$etag  = $clients['md5'];
 // always send headers
 header("Last-Modified: " . gmdate("D, d M Y H:i:s", $last_modified_time) . " GMT");
 header("Etag: $etag");
@@ -20,7 +20,7 @@ if (@strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $last_modified_time || @tr
     exit;
 }
 header('Content-type: application/json');
-header("Content-length: " . strlen($vatmap_clients_data['vatmap_clients_json']));
+header("Content-length: " . strlen($clients['json']));
 header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', $last_modified_time + 60));
-echo $vatmap_clients_data['vatmap_clients_json'];
+echo $clients['json'];
 ?>
