@@ -6,6 +6,14 @@ ini_set('display_errors', 1);
 include("config.php");
 include("Airports.php");
 
+function memcacheSetFixed(&$m, $key, $value, $flags = 0, $expiration = 0)
+{
+    if ($m->replace($key, $value, $flags, $expiration) == false) {
+        return $m->set($key, $value, $flags, $expiration);
+    }
+    return true;
+}
+
 function parseCreatedTimeStamp($str)
 {
     if (!is_string($str)) {
@@ -36,7 +44,7 @@ function getCreatedTimeStampFromMemCache()
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-    $clients_data = $m->get(md5(MEMCACHE_PREFIX_VATSIM."clients_data"));
+    $clients_data = $m->get(md5(MEMCACHE_PREFIX_VATSIM . "clients_data"));
     $m->close();
     if (!$clients_data) {
         error_log('failed to get clients_data from memcache');
@@ -86,7 +94,7 @@ function addToDB($arr, $timestamp)
             $v["atis_message"]
         );
         
-        $m->set(md5(MEMCACHE_PREFIX_VATSIM . $v["cid"].$v["callsign"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
+        memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . $v["cid"] . $v["callsign"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);
@@ -96,7 +104,7 @@ function addToDB($arr, $timestamp)
     if (json_last_error() != JSON_ERROR_NONE) {
         error_log("json_last_error(): " . json_last_error());
     }
-    $res = $m->set(md5(MEMCACHE_PREFIX_VATSIM."clients_data"), array(
+    $res = memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . "clients_data"), array(
         'json' => $json,
         'md5' => md5($json),
         'last_modified' => time(),
