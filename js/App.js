@@ -1,4 +1,6 @@
+"use strict";
 var App = function () {
+	var initialized = false;
 	var that = this;
 	var pTimeout = false;
 	var lastModified = null;
@@ -12,6 +14,7 @@ var App = function () {
 	var zoom = 3;
 	var polyLine = null;
 	var clientTemplate = null;
+	var infowindowOpened = false;
 	var getProp = function (obj, prop) {
 		if (prop in obj)
 			return obj[prop];
@@ -40,7 +43,7 @@ var App = function () {
 	}
 	var formatDepTime = function (obj, prop) {
 		var deptime = getProp(obj, prop);
-		if(deptime === "" || deptime === "0"){
+		if (deptime === "" || deptime === "0") {
 			return "";
 		}
 		while (deptime.length < 4) {
@@ -63,18 +66,14 @@ var App = function () {
 		});
 	}
 	var openInfoWindow = function (client, map, marker) {
-		if (polyLine)
+		if (polyLine) {
 			polyLine.setMap(null);
-		if (window && window.history && window.history.pushState) {
-			var callSign = client.callsign;
-			if (callSign) {
-				history.replaceState({}, document.title, "?c=" + callSign);
-			}
 		}
 		infowindow.close();
 		infowindow.vs_cid = client.cid;
 		infowindow.setContent(objectToHTML(client));
 		infowindow.open(map, marker);
+		infowindowOpened = true;
 		if (client.clienttype === "PILOT" && "planned_destairport_lat" in client && client.planned_destairport_lat != 0 && "planned_destairport_lon" in client && client.planned_destairport_lon != 0 && "planned_depairport_lat" in client && client.planned_depairport_lat != 0 && "planned_depairport_lon" in client && client.planned_depairport_lon != 0)
 			polyLine = new google.maps.Polyline({
 					path : [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon), ],
@@ -84,8 +83,7 @@ var App = function () {
 					geodesic : true,
 					map : map
 				});
-		$("#searchrow").hide();
-		$("#infoWindowContent").parent().parent().css("max-height", "9999px");
+		that.onOpenInfoWindow(client);
 	};
 	var requestClientDetails = function (cid, callsign, cb) {
 		$.ajax({
@@ -107,19 +105,28 @@ var App = function () {
 			}
 		});
 	}
-	var onCloseInfoWindow = function () {
+	var __onCloseInfoWindow = function () {
 		if (polyLine) {
 			polyLine.setMap(null);
 		}
-		$("#searchrow").show();
 		infowindow.vs_cid = -1;
 		for (var i = 0; i < tmpMarkersArray.length; i++) {
 			tmpMarkersArray[i].setMap(null);
 			delete tmpMarkersArray[i].vatsim_client_arr;
 		}
 		tmpMarkersArray = [];
-		history.replaceState({}, document.title, "?c");
+		that.onCloseInfoWindow();
+		infowindowOpened = false;
 	}
+	this.isInitialized = function () {
+		return initialized;
+	}
+	this.getMap = function () {
+		return map;
+	}
+	this.onOpenInfoWindow = function () {};
+	this.onCloseInfoWindow = function () {};
+	this.onReceiveClientsArray = function () {};
 	this.callSignsArray = [];
 	this.getUrlParam = function (name, url) {
 		if (!url) {
@@ -133,6 +140,10 @@ var App = function () {
 	}
 	this.getClientsFromServer = function () {
 		var dfd = $.Deferred();
+		if (!initialized) {
+			dfd.reject();
+			return dfd.promise();
+		}
 		$.ajax({
 			type : "GET",
 			url : "getclients.php",
@@ -191,9 +202,7 @@ var App = function () {
 						markersArray.push(marker);
 					}
 				});
-				$('#inputCallsign').autocomplete("option", {
-					source : that.callSignsArray
-				});
+				that.onReceiveClientsArray(that.callSignsArray);
 				dfd.resolve();
 			}
 		});
@@ -208,24 +217,18 @@ var App = function () {
 		pTimeout = setTimeout(that.doPoll, 60000);
 		return res;
 	}
-	this.initialize = function () {
+	this.initialize = function (conf) {
 		clientTemplate = _.template(require("raw-loader!../tpl/details.html"));
 		defaultLocation = new google.maps.LatLng(44.996883999209636, -18.800782187499979);
 		mapTypeId = google.maps.MapTypeId.TERRAIN;
-		if (('localStorage' in window) && window['localStorage'] != null) {
-			if (localStorage.getItem('map_center_lat') && localStorage.getItem('map_center_lng')) {
-				defaultLocation = new google.maps.LatLng(localStorage.getItem('map_center_lat'), localStorage.getItem('map_center_lng'));
-			}
-			if (localStorage.getItem('map_zoom')) {
-				zoom = parseInt(localStorage.getItem('map_zoom'));
-			}
-			if (localStorage.getItem('map_type')) {
-				mapTypeId = localStorage.getItem('map_type');
-			}
-			var currentCallsign = localStorage.getItem('currentCallsign');
-			if (currentCallsign) {
-				$("#inputCallsign").val(currentCallsign);
-			}
+		if (conf['map_center_lat'] && conf['map_center_lng']) {
+			defaultLocation = new google.maps.LatLng(conf['map_center_lat'], conf['map_center_lng']);
+		}
+		if (conf['map_zoom']) {
+			zoom = parseInt(conf['map_zoom']);
+		}
+		if (conf['map_type']) {
+			mapTypeId = conf['map_type'];
 		}
 		infowindow = new google.maps.InfoWindow({});
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
@@ -242,23 +245,21 @@ var App = function () {
 				}
 			});
 		google.maps.event.addListener(infowindow, 'closeclick', function () {
-			onCloseInfoWindow();
+			__onCloseInfoWindow();
 		});
 		google.maps.event.addListener(map, 'click', function () {
-			onCloseInfoWindow();
+			if (!infowindowOpened) {
+				return;
+			}
+			__onCloseInfoWindow();
 			infowindow.close();
 		});
-		window.onbeforeunload = function (e) {
-			if (('localStorage' in window) && window['localStorage'] != null) {
-				localStorage.setItem('map_center_lat', map.getCenter().lat());
-				localStorage.setItem('map_center_lng', map.getCenter().lng());
-				localStorage.setItem('map_zoom', map.zoom);
-				localStorage.setItem('map_type', map.getMapTypeId());
-				localStorage.setItem('currentCallsign', $("#inputCallsign").val());
-			}
-		};
+		initialized = true;
 	};
 	this.searchForCallsign = function (callsign) {
+		if (!initialized) {
+			return;
+		}
 		callsign = $.trim(callsign.toUpperCase());
 		for (var i = 0; i < markersArray.length; i++) {
 			var current_calsign = markersArray[i].vatsim_client_arr[1];
