@@ -32,7 +32,7 @@ var Callbacks = function () {
 		app.onOpenInfoWindow = function (client) {
 			searchrow.hide();
 			$(infoWindowContentId).parent().parent().css("max-height", "9999px");
-			if (window && window.history && window.history.pushState) {
+			if (window && window.history && window.history.replaceState) {
 				var callSign = client.callsign;
 				if (callSign) {
 					history.replaceState({}, document.title, "?c=" + callSign);
@@ -41,7 +41,9 @@ var Callbacks = function () {
 		}
 		app.onCloseInfoWindow = function () {
 			searchrow.show();
-			history.replaceState({}, document.title, '//' + location.host + location.pathname);
+			if (window && window.history && window.history.replaceState) {
+				history.replaceState({}, document.title, '//' + location.host + location.pathname);
+			}
 		}
 		app.onReceiveClientsArray = function (callSignsArray) {
 			inputCallsign.autocomplete("option", {
