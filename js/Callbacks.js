@@ -4,6 +4,15 @@ var Callbacks = function () {
 	var searchrow = $("#searchrow");
 	var inputCallsign = $("#inputCallsign");
 	var buttonCallsign = $("#buttonCallsign");
+	var saveParamsToLocalStorage = function (app) {
+		if (("localStorage" in window) && window["localStorage"] != null && app.isInitialized()) {
+			localStorage.setItem("map_center_lat", app.getMap().getCenter().lat());
+			localStorage.setItem("map_center_lng", app.getMap().getCenter().lng());
+			localStorage.setItem("map_zoom", app.getMap().zoom);
+			localStorage.setItem("map_type", app.getMap().getMapTypeId());
+		}
+		localStorage.setItem("currentCallsign", inputCallsign.val());
+	}
 	this.set = function (app) {
 		window.googleMapsLoaded = function () {
 			var conf = {};
@@ -26,9 +35,9 @@ var Callbacks = function () {
 				}
 			});
 		};
-		window.onfocus = function () {
+		$(window).focus(function () {
 			app.doPoll();
-		};
+		});
 		app.onOpenInfoWindow = function (client) {
 			searchrow.hide();
 			$(infoWindowContentId).parent().parent().css("max-height", "9999px");
@@ -38,12 +47,14 @@ var Callbacks = function () {
 					history.replaceState({}, document.title, "?c=" + callSign);
 				}
 			}
+			saveParamsToLocalStorage(app);
 		}
 		app.onCloseInfoWindow = function () {
 			searchrow.show();
 			if (window && window.history && window.history.replaceState) {
 				history.replaceState({}, document.title, '//' + location.host + location.pathname);
 			}
+			saveParamsToLocalStorage(app);
 		}
 		app.onReceiveClientsArray = function (callSignsArray) {
 			inputCallsign.autocomplete("option", {
@@ -76,13 +87,7 @@ var Callbacks = function () {
 			}
 		});
 		window.onbeforeunload = function (e) {
-			if (("localStorage" in window) && window["localStorage"] != null && app.isInitialized()) {
-				localStorage.setItem("map_center_lat", app.getMap().getCenter().lat());
-				localStorage.setItem("map_center_lng", app.getMap().getCenter().lng());
-				localStorage.setItem("map_zoom", app.getMap().zoom);
-				localStorage.setItem("map_type", app.getMap().getMapTypeId());
-			}
-			localStorage.setItem("currentCallsign", inputCallsign.val());
+			saveParamsToLocalStorage(app);
 		};
 	}
 }
