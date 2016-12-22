@@ -25,6 +25,6 @@ $json = $m->get(md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMC
 $m->close();
 header('Content-type: application/json');
 header("Content-length: " . strlen($json));
-header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', $last_modified_time + 120));
+header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', $last_modified_time + 60));
 echo $json;
 ?>
