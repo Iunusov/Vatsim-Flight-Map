@@ -44,7 +44,7 @@ function getCreatedTimeStampFromMemCache()
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-    $clients_data = $m->get(md5(MEMCACHE_PREFIX_VATSIM . "clients_data"));
+    $clients_data = $m->get(md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META));
     $m->close();
     if (!$clients_data) {
         error_log('failed to get clients_data from memcache');
@@ -104,8 +104,7 @@ function addToDB($arr, $timestamp)
     if (json_last_error() != JSON_ERROR_NONE) {
         error_log("json_last_error(): " . json_last_error());
     }
-    $res = memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . "clients_data"), array(
-        'json' => $json,
+    $res = memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_JSON), $json) && memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META), array(
         'md5' => md5($json),
         'last_modified' => time(),
         'created_timestamp' => $timestamp
