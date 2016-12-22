@@ -50,7 +50,7 @@ function getCreatedTimeStampFromMemCache()
         error_log('failed to get clients_data from memcache');
         return false;
     }
-    return $clients_data['created_timestamp'];
+    return (int)$clients_data['created_timestamp'];
 }
 
 function toUTF8($str)
@@ -141,7 +141,7 @@ function trytoparse($url)
         error_log('no timestamp from memcache, skip checking.');
     }
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache)) {
-        error_log('old data, skip');
+        //error_log('old data, skip');
         return false;
     }
     
