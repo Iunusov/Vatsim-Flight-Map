@@ -125,6 +125,6 @@ https://vatmap.jsound.org/
 
 ## Stats (Unique visits, weekly)
 
-![Statcounter Stats](http://statcounter.com/p10266561/summary/weekly-u-labels-line-all.png "Vatsim Flight Map")
+![Statcounter Stats](https://statcounter.com/p10266561/summary/weekly-u-labels-line-all.png "Vatsim Flight Map")
 
 
