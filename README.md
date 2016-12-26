@@ -123,8 +123,9 @@ MIT License
 
 https://vatmap.jsound.org/
 
-## Stats (Unique visits, weekly)
+## Stats (StatCounter)
 
-![Statcounter Stats](https://statcounter.com/p10266561/summary/weekly-u-labels-line-all.png "Vatsim Flight Map")
+[StatCounter](http://statcounter.com/p10266561/summary/?guest=1)
+
 
 
