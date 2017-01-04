@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+php_sapi_name() == "cli" or die("<br><strong>This script is not intended to be runned from web.</strong>" . PHP_EOL);
 define("TARGET_DIR", "../../img/planes/");
 $source = imagecreatefrompng("source.png");
 imagealphablending($source, false);
