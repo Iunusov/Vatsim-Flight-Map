@@ -59,7 +59,7 @@ The following guide is for Ubuntu 16.04.
 
 Install the required packages:
 ```
-sudo apt-get install memcached nginx php7.1 php7.1-fpm php7.1-cli php7.1-memcache php7.1-xml php7.1-mbstring
+sudo apt-get install memcached nginx php7.0-fpm php7.0-cli php7.0-xml php-memcache
 ```
 
 Enable php support in nginx:
@@ -74,13 +74,13 @@ location ~ \.php$ {
                 #Include Nginx’s fastcgi configuration
                 include /etc/nginx/fastcgi.conf;
                 #Look for the FastCGI Process Manager at this location
-                fastcgi_pass unix:/run/php/php7.1-fpm.sock;
+                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
         }
 ```
 
 Restart the services:
 ```
-sudo service php7.1-fpm restart
+sudo service php7.0-fpm restart
 sudo service nginx restart
 ```
 
