@@ -14,11 +14,11 @@
 </tr>
 <tr>
 <td>Altitude: </td>
-<td class="text-nowrap"><strong><%- client.altitude %> ft<% if(client.planned_altitude) {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></strong></td>
+<td class="text-nowrap"><strong><%- client.altitude %> ft<% if(client.planned_altitude !== "0") {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></strong></td>
 </tr>
 <tr>
 <td>Speed: </td>
-<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise != 0) {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
+<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise !== "0") {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
 </tr>
 <tr>
 <td>Heading: </td>
@@ -28,16 +28,22 @@
 <td>QNH: </td>
 <td class="text-nowrap"><strong><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></strong></td>
 </tr>
-<% if(client.planned_hrsenroute != 0 && client.planned_minenroute != 0) {%>
+
 <tr>
-<td>Enroute: </td>
-<td class="text-nowrap"><strong><%- client.planned_hrsenroute %>h <%- client.planned_minenroute %>m<% if(client.planned_hrsfuel && client.planned_minfuel) {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel %>h <%- client.planned_minfuel %>m)</span><% } %></strong></td>
+<% if(client.planned_deptime && client.planned_deptime !== "0"){ %>
+<td>Deptime: </td>
+<td><strong><%- client.planned_deptime %> UTC <span class="text-muted">(planned)</span></strong></td>
 </tr>
 <% } %>
-<tr>
-<% if(client.planned_deptime){ %>
+<% if(client.planned_actdeptime && client.planned_actdeptime !== "0"){ %>
 <td>Deptime: </td>
-<td><strong><%- client.planned_deptime %> UTC</strong></td>
+<td><strong><%- client.planned_actdeptime %> UTC <span class="text-muted">(actual)</span></strong></td>
+</tr>
+<% } %>
+<% if(client.planned_hrsenroute && client.planned_hrsenroute !== "0" || client.planned_minenroute && client.planned_minenroute !== "0") {%>
+<tr>
+<td>Enroute: </td>
+<td class="text-nowrap"><strong><%- client.planned_hrsenroute || "0" %>h <%- client.planned_minenroute || 0 %>m<% if(client.planned_hrsfuel && client.planned_hrsfuel !== "0" || client.planned_minfuel && client.planned_minfuel !== "0") {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel || "0" %>h <%- client.planned_minfuel || "0" %>m)</span><% } %></strong></td>
 </tr>
 <% } %>
 <% if(client.planned_remarks){ %>
