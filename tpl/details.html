@@ -14,11 +14,11 @@
 </tr>
 <tr>
 <td>Altitude: </td>
-<td class="text-nowrap"><strong><%- client.altitude %> ft<% if(client.planned_altitude !== "0") {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></strong></td>
+<td class="text-nowrap"><strong><%- client.altitude %> ft<% if(client.planned_altitude && client.planned_altitude !== "0") {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></strong></td>
 </tr>
 <tr>
 <td>Speed: </td>
-<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise !== "0") {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
+<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise && client.planned_tascruise !== "0") {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
 </tr>
 <tr>
 <td>Heading: </td>
@@ -62,10 +62,12 @@
 <td class="text-nowrap">Visual Range: </td>
 <td class="text-nowrap"><strong><%- client.visualrange %></strong></td>
 </tr>
+<% if(client.time_last_atis_received && client.time_last_atis_received !== "0"){ %>
 <tr>
 <td class="text-nowrap">ATIS received: </td>
 <td class="text-nowrap"><strong><%- client.time_last_atis_received %> UTC</strong></td>
 </tr>
+<% } %>
 <% if(client.atis_message){ %>
 <tr><td  colspan="2"><details open="open"><summary>ATIS message</summary><pre><%- client.atis_message %>
 </pre>
