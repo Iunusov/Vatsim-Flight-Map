@@ -166,19 +166,12 @@ function trytoparse($url)
     $tpl_array     = explode(":", trim($clients_tpl[1]));
     
     foreach ($clients as $key => $item) {
-        $keys_diff = substr_count($clients_tpl[1], ":") - substr_count($item, ":");
-        for ($i = 0; $i < $keys_diff; $i++) {
-            error_log("cl_array was corrected!");
-            $item .= ":";
-        }
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
-        $clients_final[$key] = array_combine($tpl_array, $cl_array);
-        if (!is_array($clients_final[$key])) {
-            error_log("array_combine() failed!");
-            error_log("count(tpl_array): " . count($tpl_array));
-            error_log("count(cl_array): " . count($cl_array));
-        }
+		$combined = array_combine($tpl_array, $cl_array);
+		if($combined && is_array($combined)){
+			$clients_final[$key] = $combined;
+		}
     }
     
     //get planned_depairport_lat, planned_depairport_lon, planned_destairport_lat, planned_destairport_lon values from the database
