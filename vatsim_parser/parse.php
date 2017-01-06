@@ -7,6 +7,8 @@ ini_set('display_errors', 1);
 include("config.php");
 include("Airports.php");
 
+define ("EOL_VATSIM_", chr(10));
+
 function memcacheSetFixed(&$m, $key, $value, $flags = 0, $expiration = 0)
 {
     if ($m->replace($key, $value, $flags, $expiration) == false) {
@@ -61,7 +63,7 @@ function toUTF8($str)
     } else {
         $resultUTF8 = $str;
     }
-    return str_replace(utf8_encode(chr(0x5E) . chr(0xA7)), PHP_EOL, $resultUTF8);
+    return str_replace(utf8_encode(chr(0x5E) . chr(0xA7)), "\n", $resultUTF8);
 }
 
 function fixArrayEncoding(&$arr)
@@ -124,8 +126,11 @@ function trytoparse($url)
         error_log("file_get_contents($url) fails");
         return false;
     }
-    preg_match("/!CLIENTS:(.*)" . PHP_EOL . ";" . PHP_EOL . ";" . PHP_EOL . "!SERVERS:/s", $data, $clients_container);
-    
+	if(!strpos($data, ";   END")){
+		error_log("skip bad vatsim-data.txt");
+		return false;
+	}
+    preg_match("/!CLIENTS:(.*?)" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . "/s", $data, $clients_container);
     
     if (!isset($clients_container[1])) {
         error_log("cannot parse data");
@@ -146,7 +151,7 @@ function trytoparse($url)
         return false;
     }
     
-    preg_match_all("/(.*):" . PHP_EOL . "/", $clients_container[1], $clients);
+    preg_match_all("/(.*?):" . EOL_VATSIM_ . "/", $clients_container[1], $clients);
     
     if (!isset($clients[1])) {
         error_log("cannot parse !CLIENTS container ($url)");
@@ -155,7 +160,7 @@ function trytoparse($url)
     
     $clients = $clients[1];
     
-    preg_match("/; !CLIENTS section -(.*):" . PHP_EOL . "; !PREFILE/", $data, $clients_tpl);
+    preg_match("/; !CLIENTS section -(.*?):" . EOL_VATSIM_ . ";/", $data, $clients_tpl);
     
     if (!isset($clients_tpl[1])) {
         error_log("cannot parse clients_tpl ($url)");
