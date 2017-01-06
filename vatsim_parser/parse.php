@@ -127,7 +127,6 @@ function trytoparse($url)
         return false;
     }
 	if(!strpos($data, ";   END")){
-		error_log("skip bad vatsim-data.txt");
 		return false;
 	}
     preg_match("/!CLIENTS:(.*?)" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . "/s", $data, $clients_container);
