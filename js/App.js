@@ -65,6 +65,13 @@ var App = function () {
 			client : client
 		});
 	}
+	var markerClickListener = function () {
+		var marker = this;
+		requestClientDetails(marker.vatsim_cid, marker.vatsim_callsign, function (clientDetails) {
+			openInfoWindow(clientDetails, map, marker);
+		});
+
+	}
 	var openInfoWindow = function (client, map, marker) {
 		if (polyLine) {
 			polyLine.setMap(null);
@@ -101,7 +108,7 @@ var App = function () {
 			},
 			error : function (xhr, ajaxOptions, thrownError) {
 				if (xhr.status == 404) {
-					window.location.reload(true);
+					//window.location.reload(true);
 				}
 			}
 		});
@@ -187,11 +194,7 @@ var App = function () {
 								vatsim_callsign : client[1]
 							})
 							marker.setMap(map);
-						google.maps.event.addListener(marker, 'click', function () {
-							requestClientDetails(cid, callsign, function (clientDetails) {
-								openInfoWindow(clientDetails, map, marker);
-							});
-						});
+						google.maps.event.addListener(marker, 'click', markerClickListener);
 						markersArray.push(marker);
 					}
 				});
