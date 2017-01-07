@@ -22,14 +22,15 @@ module.exports = {
 		]
 	},
 	entry : {
-		app : ['jquery', 'jquery-ui/ui/widgets/autocomplete', 'underscore', 'bootstrap', 'bootstrap/dist/css/bootstrap.css', 'jquery-ui/themes/base/autocomplete.css', 'jquery-ui/themes/base/core.css', 'jquery-ui/themes/base/menu.css', 'jquery-ui/themes/base/theme.css', './prod.js', './js/main.js']
+		app : ['./prod.js', './js/main.js'],
+		vendor : ['jquery', 'jquery-ui/ui/widgets/autocomplete', 'underscore', 'bootstrap', 'bootstrap/dist/css/bootstrap.css', 'jquery-ui/themes/base/autocomplete.css', 'jquery-ui/themes/base/core.css', 'jquery-ui/themes/base/menu.css', 'jquery-ui/themes/base/theme.css']
 	},
 	output : {
 		path : 'dist/',
 		filename : '[name]_[chunkhash].js',
 		publicPath : 'dist/'
 	},
-	plugins : [new webpack.ProvidePlugin({
+	plugins : [new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor_[chunkhash].js'), new webpack.ProvidePlugin({
 			$ : 'jquery',
 			jQuery : 'jquery',
 			'window.jQuery' : 'jquery',
@@ -39,6 +40,6 @@ module.exports = {
 			filename : '../index.html',
 			inject : 'body',
 		}), new ScriptExtHtmlWebpackPlugin({
-			defaultAttribute : 'async'
+			defaultAttribute : 'defer'
 		})],
 };
