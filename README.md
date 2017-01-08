@@ -42,6 +42,12 @@ git update-index --assume-unchanged prod.js
 
 ## Build
 
+Request API key for Google Maps:
+https://developers.google.com/maps/documentation/javascript/get-api-key
+
+after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-Flight-Map/blob/master/prod.js) file.
+
+Now you can perform the build:
 ```
 npm install
 webpack
@@ -105,11 +111,6 @@ You probably might want to add these scripts to crontab:
 **parse.php** is for parsing Vatsim data
 
 **get_servers.php** is for parsing Vatsim servers list (can be runned daily)
-
-Request API key for Google Maps:
-https://developers.google.com/maps/documentation/javascript/get-api-key
-
-after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-Flight-Map/blob/master/prod.js) file.
 
 Open url in your browser:
 
