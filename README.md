@@ -20,7 +20,7 @@
 ## Clonning a repo
 
     $ git clone https://github.com/Iunusov/Vatsim-Flight-Map
-    $cd Vatsim-Flight-Map
+    $ cd Vatsim-Flight-Map
 
 (optional) do not track prod.js file changes in git:
 
