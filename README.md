@@ -11,34 +11,20 @@
 [Webpack](https://webpack.github.io/docs/tutorials/getting-started/)
 
 ## Prerequisites: Frontend
-```
-sudo apt-get update
-```
 
-```
-sudo apt-get install nodejs npm
-```
-
-```
-sudo ln -s /usr/bin/nodejs /usr/bin/node
-```
-
-```
-sudo npm install webpack -g
-```
+    $ sudo apt-get update
+    $ sudo apt-get install nodejs npm
+    $ sudo ln -s /usr/bin/nodejs /usr/bin/node
+    $ sudo npm install webpack -g
 
 ## Clonning a repo
 
-```
-git clone https://github.com/Iunusov/Vatsim-Flight-Map
-cd Vatsim-Flight-Map
-```
+    $ git clone https://github.com/Iunusov/Vatsim-Flight-Map
+    $cd Vatsim-Flight-Map
 
 (optional) do not track prod.js file changes in git:
 
-```
-git update-index --assume-unchanged prod.js
-```
+    $ git update-index --assume-unchanged prod.js
 
 ## Build
 
@@ -48,30 +34,25 @@ https://developers.google.com/maps/documentation/javascript/get-api-key
 after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-Flight-Map/blob/master/prod.js) file.
 
 Now you can perform the build:
-```
-npm install
-webpack
-```
+
+    $ npm install
+    $ webpack
 
 production build (with optimizations and minifications):
 
-```
-webpack -p
-```
+    $ webpack -p
 
 ## Prerequisites: Backend
 
 The following guide is for Ubuntu 16.04.
 
 Install the required packages:
-```
-sudo apt-get install memcached nginx php7.0-fpm php7.0-cli php7.0-xml php-memcache
-```
+
+    $ sudo apt-get install memcached nginx php7.0-fpm php7.0-cli php7.0-xml php-memcache
 
 Enable php support in nginx:
-```
-sudo nano /etc/nginx/sites-available/default
-```
+
+     $ sudo nano /etc/nginx/sites-available/default
 
 ```
 location ~ \.php$ {
@@ -85,22 +66,18 @@ location ~ \.php$ {
 ```
 
 Restart the services:
-```
-sudo service php7.0-fpm restart
-sudo service nginx restart
-```
 
-```
-cd /var/www/html
-sudo chmod 757 .
-```
+    $ sudo service php7.0-fpm restart
+    $ sudo service nginx restart
+    
+    $ cd /var/www/html
+    $ sudo chmod 757 .
 
 Parse some data (for testing):
-```
-cd vatsim_parser
-./get_servers.php
-./parse.php
-```
+
+    $ cd vatsim_parser
+    $ ./get_servers.php
+    $ ./parse.php
 
 You probably might want to add these scripts to crontab:
 ```
