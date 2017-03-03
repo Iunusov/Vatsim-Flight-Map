@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 include("config.php");
 include("Airports.php");
 
-define ("EOL_VATSIM_", chr(10));
+define ("EOL_VATSIM_", "\r\n");
 
 function memcacheSetFixed(&$m, $key, $value, $flags = 0, $expiration = 0)
 {
