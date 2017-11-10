@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 include("config.php");
 include("Airports.php");
 
-define ("EOL_VATSIM_", "\r?\n");
+define ("EOL_VATSIM_", "\n");
 
 function memcacheSetFixed(&$m, $key, $value, $flags = 0, $expiration = 0)
 {
@@ -122,6 +122,7 @@ function trytoparse($url)
 {
     $clients_container = Array();
     $data              = file_get_contents($url);
+	$data = str_replace("\r\n", "\n", $data);
     if (!$data) {
         error_log("file_get_contents($url) fails");
         return false;
