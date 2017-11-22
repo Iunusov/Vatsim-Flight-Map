@@ -83,7 +83,7 @@ You probably might want to add these scripts to crontab:
 ```
 */2 * * * * cd /<path_to_your_site>/vatsim_parser; ./parse.php >> <logfile_name> 2>&1
 
-* */6 * * * cd /<path_to_your_site>/vatsim_parser; ./get_servers.php >> <logfile_name> 2>&1
+0 */6 * * * cd /<path_to_your_site>/vatsim_parser; ./get_servers.php >> <logfile_name> 2>&1
 ```
 **parse.php** is for parsing Vatsim data
 
