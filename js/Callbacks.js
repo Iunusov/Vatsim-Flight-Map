@@ -1,10 +1,6 @@
 "use strict";
-var Callbacks = function () {
-	var app = {};
-
-	this.setApp = function (app_) {
-		app = app_;
-	}
+var Callbacks = function (app_) {
+	var app = app_;
 
 	this.start = function () {
 		var conf = {};
@@ -82,6 +78,8 @@ var Callbacks = function () {
 
 		inputCallsign.autocomplete({
 			source : [],
+			delay: 0,
+			minLength : 2,
 			open : function (result) {
 				if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
 					$(".ui-autocomplete").off("menufocus hover mouseover");

@@ -1,65 +1,28 @@
 "use strict";
+var Utils = require("./Utils.js");
 var App = function () {
 	var that = this;
 	var pTimeout = false;
 	var lastModified = "";
 	var map = false;
 	var markersArray = [];
-	var clients = [];
-	var infowindow = null;
+	var infowindow = new google.maps.InfoWindow({});
 	var tmpMarkersArray = [];
 	var defaultLocation = null;
 	var mapTypeId = null;
 	var zoom = 3;
 	var polyLine = null;
-	var clientTemplate = null;
-	var infowindowOpened = false;
-	var getFlightType = function (s) {
-		var result = s;
-		if (s === "I") {
-			result = "IFR";
-		}
-		if (s === "V") {
-			result = "VFR";
-		}
-		return result;
-	}
-	//20170104045956 => 04:59:56
-	var formatDate = function (str) {
-		if (!str || str.length != 14 || !parseInt(str)) {
-			return str;
-		}
-		return str.substring(8, 10) + ":" + str.substring(10, 12) + ":" + str.substring(12, 14);
-	}
-	//34098 => 34,098
-	function commaSeparateNumber(val) {
-		if (!parseInt(val)) {
-			return val;
-		}
-		while (/(\d+)(\d{3})/.test(val.toString())) {
-			val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
-		}
-		return val;
-	}
-	//520 => 05:20
-	var formatDepTime = function (str) {
-		if (!parseInt(str)) {
-			return str;
-		}
-		while (str.length < 4) {
-			str = "0" + str;
-		}
-		return str.substring(0, 2) + ":" + str.substring(2, 4);
-	}
+	var clientTemplate = _.template(require("raw-loader!../tpl/details.html"));
+	var utils = new Utils();
 	var objectToHTML = function (client) {
-		client["altitude"] = commaSeparateNumber(client["altitude"]);
-		client["time_logon"] = formatDate(client["time_logon"]);
+		client["altitude"] = utils.commaSeparateNumber(client["altitude"]);
+		client["time_logon"] = client["time_online"];
 		if (client.clienttype === "PILOT") {
-			client["planned_deptime"] = formatDepTime(client["planned_deptime"]);
-			client["planned_actdeptime"] = formatDepTime(client["planned_actdeptime"]);
+			client["planned_deptime"] = utils.formatDepTime(client["planned_deptime"]);
+			client["planned_actdeptime"] = utils.formatDepTime(client["planned_actdeptime"]);
 		} else
 			if (client.clienttype === "ATC") {
-				client["time_last_atis_received"] = formatDate(client["time_last_atis_received"]);
+				client["time_last_atis_received"] = utils.formatDate(client["time_last_atis_received"]);
 			}
 		return clientTemplate({
 			client : client
@@ -67,7 +30,7 @@ var App = function () {
 	}
 	var markerClickListener = function () {
 		var marker = this;
-		requestClientDetails(marker.vatsim_cid, marker.vatsim_callsign, function (clientDetails) {
+		requestClientDetails(marker.vatsim_callsign, function (clientDetails) {
 			openInfoWindow(clientDetails, map, marker);
 		});
 
@@ -76,11 +39,10 @@ var App = function () {
 		if (polyLine) {
 			polyLine.setMap(null);
 		}
-		infowindow.close();
+		closeInfoWindow();
 		infowindow.vatsim_cid = client.cid;
 		infowindow.setContent(objectToHTML(client));
 		infowindow.open(map, marker);
-		infowindowOpened = true;
 		if (client.clienttype === "PILOT" && parseFloat(client["planned_destairport_lat"]) && parseFloat(client["planned_destairport_lon"]) && parseFloat(client["planned_depairport_lat"]) && parseFloat(client["planned_depairport_lon"])) {
 			polyLine = new google.maps.Polyline({
 					path : [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon), ],
@@ -93,38 +55,36 @@ var App = function () {
 		}
 		that.onOpenInfoWindow(client);
 	};
-	var requestClientDetails = function (cid, callsign, cb) {
+	
+	var closeInfoWindow = function () {
+		infowindow.close();
+		infowindow.setContent("");
+		infowindow.vatsim_cid = -1;
+		if (polyLine) {
+			polyLine.setMap(null);
+		}
+		for (var i = 0; i < tmpMarkersArray.length; i++) {
+			tmpMarkersArray[i].setMap(null);
+		}
+		tmpMarkersArray = [];
+		that.onCloseInfoWindow();
+	}
+	
+	var requestClientDetails = function (callsign, cb) {
 		$.ajax({
 			type : "GET",
 			url : "getcdetails.php",
 			data : {
-				cid : cid,
 				callsign : callsign
 			},
 			contentType : "application/json",
 			dataType : "json",
 			success : function (data, textStatus, request) {
 				cb(data);
-			},
-			error : function (xhr, ajaxOptions, thrownError) {
-				if (xhr.status == 404) {
-					//window.location.reload(true);
-				}
 			}
 		});
 	}
-	var __onCloseInfoWindow = function () {
-		if (polyLine) {
-			polyLine.setMap(null);
-		}
-		infowindow.vatsim_cid = -1;
-		for (var i = 0; i < tmpMarkersArray.length; i++) {
-			tmpMarkersArray[i].setMap(null);
-		}
-		tmpMarkersArray = [];
-		that.onCloseInfoWindow();
-		infowindowOpened = false;
-	}
+	
 	this.getMap = function () {
 		return map;
 	}
@@ -160,11 +120,12 @@ var App = function () {
 					if (infowindow.vatsim_cid === markersArray[i].vatsim_cid) {
 						tmpMarkersArray.push(markersArray[i]);
 					} else {
+						google.maps.event.clearInstanceListeners(markersArray[i]);
 						markersArray[i].setMap(null);
+						delete markersArray[i];
 					}
-					google.maps.event.clearInstanceListeners(markersArray[i]);
+					
 				}
-				clients = data;
 				markersArray = [];
 				that.callSignsArray = [];
 				$.each(data, function (index, client) {
@@ -214,11 +175,9 @@ var App = function () {
 		return res;
 	}
 	this.initialize = function (conf) {
-		clientTemplate = _.template(require("raw-loader!../tpl/details.html"));
 		zoom = parseInt(conf['map_zoom']) || zoom;
 		defaultLocation = new google.maps.LatLng(parseFloat(conf['map_center_lat']) || 44.996883999209636, parseFloat(conf['map_center_lng']) || -18.800782187499979);
 		mapTypeId = _.contains(google.maps.MapTypeId, conf['map_type']) ? conf['map_type'] : google.maps.MapTypeId.TERRAIN;
-		infowindow = new google.maps.InfoWindow({});
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
 				zoom : zoom,
 				center : defaultLocation,
@@ -233,23 +192,18 @@ var App = function () {
 				}
 			});
 		google.maps.event.addListener(infowindow, 'closeclick', function () {
-			__onCloseInfoWindow();
+			closeInfoWindow();
 		});
 		google.maps.event.addListener(map, 'click', function () {
-			if (!infowindowOpened) {
-				return;
-			}
-			__onCloseInfoWindow();
-			infowindow.close();
+			closeInfoWindow();
 		});
 	};
 	this.searchForCallsign = function (callsign) {
 		callsign = $.trim(callsign.toUpperCase());
 		for (var i = 0; i < markersArray.length; i++) {
-			var current_calsign = markersArray[i].vatsim_callsign;
-			var current_cid = markersArray[i].vatsim_cid;
+			var current_calsign = markersArray[i].vatsim_callsign.toUpperCase();
 			if (current_calsign === callsign) {
-				requestClientDetails(current_cid, callsign, function (clientDetails) {
+				requestClientDetails(callsign, function (clientDetails) {
 					openInfoWindow(clientDetails, map, markersArray[i]);
 				});
 				break;

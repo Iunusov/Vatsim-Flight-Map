@@ -9,6 +9,16 @@ include("Airports.php");
 
 define ("EOL_VATSIM_", "\n");
 
+function getLogonTime($str){
+	if(strlen($str) != 14){
+		return "";
+	}
+	$formatted = substr($str,0,4).":".substr($str,4,2).":".substr($str,6,2). " ". substr($str,8,2). ":" .substr($str,10,2) . ":" . substr($str,12,2);
+	$logonDateTime = new DateTime("$formatted", new DateTimeZone("UTC"));
+	$interval = $logonDateTime->diff(new DateTime(null, new DateTimeZone("UTC")));
+	return $interval->format('%d days %h hours %i minutes');
+}
+
 function memcacheSetFixed(&$m, $key, $value, $flags = 0, $expiration = 0)
 {
     if ($m->replace($key, $value, $flags, $expiration) == false) {
@@ -97,7 +107,7 @@ function addToDB($arr, $timestamp)
             $v["atis_message"]
         );
         
-        memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . $v["cid"] . $v["callsign"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
+        memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $v["callsign"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);
@@ -176,6 +186,7 @@ function trytoparse($url)
 		$combined = array_combine($tpl_array, $cl_array);
 		if($combined && is_array($combined)){
 			$clients_final[$key] = $combined;
+			$clients_final[$key]["time_online"] = getLogonTime($clients_final[$key]["time_logon"]);
 		}
     }
     

@@ -1,5 +1,5 @@
 <a href="http://vataware.com/pilot/<%- client.cid %>"><h5><%- client.callsign %> (<%- client.realname %>) </h5></a>
-<p><strong><span class="glyphicon glyphicon-globe"></span> <%- client.server %></strong> <em>(logon: <%- client.time_logon %> UTC)</em></p>
+<p><strong><span class="glyphicon glyphicon-globe"></span> <%- client.server %></strong> <em>(<%- client.time_logon %>)</em></p>
 <table class="table-responsive table-striped" style="border-collapse: separate;border-spacing: 2px 2px;">
 <% if (client.clienttype === "PILOT") { %>
 <% if(client.planned_depairport && client.planned_destairport) { %>

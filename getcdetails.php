@@ -26,16 +26,15 @@ header('Pragma: no-cache');
 
 require('vatsim_parser/config.php');
 
-$cid = parseIntParam('cid', $_GET);
 $callsign = $_GET["callsign"];
 
-if ($cid === NULL || empty($callsign)) {
+if (empty($callsign)) {
     exit404();
 }
 $details = FALSE;
 $m       = new Memcache;
 if ($m->connect(MEMCACHE_IP, MEMCACHE_PORT)) {
-    $details = $m->get(md5(MEMCACHE_PREFIX_VATSIM . $cid.$callsign));
+    $details = $m->get(md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" .$callsign));
     $m->close();
 }
 
