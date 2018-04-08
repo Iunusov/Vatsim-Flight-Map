@@ -103,11 +103,10 @@ function addToDB($arr, $timestamp)
             $v["clienttype"],
             $v["heading"],
             $v["latitude"],
-            $v["longitude"],
-            $v["atis_message"]
+            $v["longitude"]
         );
         
-        memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $v["callsign"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
+        memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $v["callsign"] . $v["cid"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);
@@ -132,7 +131,7 @@ function trytoparse($url)
 {
     $clients_container = Array();
     $data              = file_get_contents($url);
-	$data = str_replace("\r\n", "\n", $data);
+	$data = str_replace("\r\n", EOL_VATSIM_, $data);
     if (!$data) {
         error_log("file_get_contents($url) fails");
         return false;
