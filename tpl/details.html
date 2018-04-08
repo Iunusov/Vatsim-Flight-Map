@@ -1,49 +1,49 @@
-<a href="http://vataware.com/pilot/<%- client.cid %>"><h5><%- client.callsign %> (<%- client.realname %>) </h5></a>
-<p><strong><span class="glyphicon glyphicon-globe"></span> <%- client.server %></strong> <em>(<%- client.time_logon %>)</em></p>
+<h6><a href="http://vataware.com/pilot/<%- client.cid %>"><%- client.callsign %> (<%- client.realname %>)</a></h6>
+<p><span class="font-weight-bold"><span class="ui-icon ui-icon-home"></span> <%- client.server %> </span><em>(<%- client.time_logon %>)</em></p>
 <table class="table-responsive table-striped" style="border-collapse: separate;border-spacing: 2px 2px;">
 <% if (client.clienttype === "PILOT") { %>
 <% if(client.planned_depairport && client.planned_destairport) { %>
 <tr>
 <td>Path: </td>
-<td class="text-nowrap"><strong><%- client.planned_depairport %> <span class="glyphicon glyphicon-arrow-right"></span> <%- client.planned_destairport %> <% if(client.planned_altairport){ %><span class="text-muted">(alt: <%- client.planned_altairport %>)</span><% } %></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_depairport %> <span class="ui-icon ui-icon-arrowthick-1-e"></span> <%- client.planned_destairport %> <% if(client.planned_altairport){ %><span class="text-muted">(alt: <%- client.planned_altairport %>)</span><% } %></td>
 </tr>
 <% } %>
 <tr>
 <td>Aircraft: </td>
-<td class="text-nowrap"><strong><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></strong></td>
+<td class="text-nowrap font-weight-bold"><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></td>
 </tr>
 <tr>
 <td>Altitude: </td>
-<td class="text-nowrap"><strong><%- client.altitude %> ft<% if(client.planned_altitude && client.planned_altitude !== "0") {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.altitude %> ft<% if(client.planned_altitude && client.planned_altitude !== "0") {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></td>
 </tr>
 <tr>
 <td>Speed: </td>
-<td class="text-nowrap"><strong><%- client.groundspeed %> kts<% if(client.planned_tascruise && client.planned_tascruise !== "0") {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.groundspeed %> kts<% if(client.planned_tascruise && client.planned_tascruise !== "0") {%> <span class="text-muted">(<%- client.planned_tascruise %> planned)</span><% } %></td>
 </tr>
 <tr>
 <td>Heading: </td>
-<td><strong><%- client.heading %></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.heading %></td>
 </tr>
 <tr>
 <td>QNH: </td>
-<td class="text-nowrap"><strong><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></td>
 </tr>
 
 <tr>
 <% if(client.planned_deptime && client.planned_deptime !== "0"){ %>
 <td>Deptime: </td>
-<td><strong><%- client.planned_deptime %> UTC <span class="text-muted">(planned)</span></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_deptime %> UTC <span class="text-muted">(planned)</span></td>
 </tr>
 <% } %>
 <% if(client.planned_actdeptime && client.planned_actdeptime !== "0"){ %>
 <td>Deptime: </td>
-<td><strong><%- client.planned_actdeptime %> UTC <span class="text-muted">(actual)</span></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_actdeptime %> UTC <span class="text-muted">(actual)</span></td>
 </tr>
 <% } %>
 <% if(client.planned_hrsenroute && client.planned_hrsenroute !== "0" || client.planned_minenroute && client.planned_minenroute !== "0") {%>
 <tr>
-<td>Enroute: </td>
-<td class="text-nowrap"><strong><%- client.planned_hrsenroute || "0" %>h <%- client.planned_minenroute || 0 %>m<% if(client.planned_hrsfuel && client.planned_hrsfuel !== "0" || client.planned_minfuel && client.planned_minfuel !== "0") {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel || "0" %>h <%- client.planned_minfuel || "0" %>m)</span><% } %></strong></td>
+<td class="text-nowrap">Enroute: </td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_hrsenroute || "0" %>h <%- client.planned_minenroute || 0 %>m<% if(client.planned_hrsfuel && client.planned_hrsfuel !== "0" || client.planned_minfuel && client.planned_minfuel !== "0") {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel || "0" %>h <%- client.planned_minfuel || "0" %>m)</span><% } %></td>
 </tr>
 <% } %>
 <% if(client.planned_remarks){ %>
@@ -56,21 +56,21 @@
 <% if (client.clienttype === "ATC") { %>
 <tr>
 <td class="text-nowrap">Frequency: </td>
-<td class="text-nowrap"><strong><%- client.frequency %></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.frequency %></td>
 </tr>
 <tr>
 <td class="text-nowrap">Visual Range: </td>
-<td class="text-nowrap"><strong><%- client.visualrange %></strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.visualrange %></td>
 </tr>
 <% if(client.time_last_atis_received && client.time_last_atis_received !== "0"){ %>
 <tr>
 <td class="text-nowrap">ATIS received: </td>
-<td class="text-nowrap"><strong><%- client.time_last_atis_received %> UTC</strong></td>
+<td class="text-nowrap font-weight-bold"><%- client.time_last_atis_received %> UTC</td>
 </tr>
 <% } %>
 <% if(client.atis_message){ %>
-<tr><td  colspan="2"><details open="open"><summary>ATIS message</summary><pre><%- client.atis_message %>
-</pre>
+<tr><td  colspan="2"><details open="open"><summary>ATIS message</summary><div class="alert alert-info"><pre><%- client.atis_message %>
+</pre></div>
 </details></td></tr>
 <% } %>
 <% } %>

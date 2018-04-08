@@ -1,4 +1,5 @@
 "use strict";
+var _ = require('underscore');
 var Utils = require("./Utils.js");
 var App = function () {
 	var that = this;
@@ -55,7 +56,7 @@ var App = function () {
 		}
 		that.onOpenInfoWindow(client);
 	};
-	
+
 	var closeInfoWindow = function () {
 		infowindow.close();
 		infowindow.setContent("");
@@ -69,7 +70,7 @@ var App = function () {
 		tmpMarkersArray = [];
 		that.onCloseInfoWindow();
 	}
-	
+
 	var requestClientDetails = function (callsign, cb) {
 		$.ajax({
 			type : "GET",
@@ -84,7 +85,7 @@ var App = function () {
 			}
 		});
 	}
-	
+
 	this.getMap = function () {
 		return map;
 	}
@@ -124,7 +125,7 @@ var App = function () {
 						markersArray[i].setMap(null);
 						delete markersArray[i];
 					}
-					
+
 				}
 				markersArray = [];
 				that.callSignsArray = [];

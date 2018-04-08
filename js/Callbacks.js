@@ -1,4 +1,5 @@
 "use strict";
+require('jquery-ui/ui/widgets/autocomplete');
 var Callbacks = function (app_) {
 	var app = app_;
 
@@ -78,7 +79,7 @@ var Callbacks = function (app_) {
 
 		inputCallsign.autocomplete({
 			source : [],
-			delay: 0,
+			delay : 0,
 			minLength : 2,
 			open : function (result) {
 				if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
