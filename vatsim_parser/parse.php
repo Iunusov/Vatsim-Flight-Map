@@ -19,7 +19,7 @@ function getLogonTime($str){
 	return $interval->format('%d days %h hours %i minutes');
 }
 
-function memcacheSetFixed(&$m, $key, $value, $flags = 0, $expiration = 0)
+function addKeyValueToMemcache(&$m, $key, $value, $flags = 0, $expiration = 0)
 {
     if ($m->replace($key, $value, $flags, $expiration) == false) {
         return $m->set($key, $value, $flags, $expiration);
@@ -106,7 +106,7 @@ function addToDB($arr, $timestamp)
             $v["longitude"]
         );
         
-        memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $v["callsign"] . $v["cid"]), json_encode($v), 0, 60 * 60 * 24); //24 hours expiration
+        addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $v["callsign"] . $v["cid"]), json_encode($v), 0, 60 * 5); //expiration time: 5 minutes
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);
@@ -116,7 +116,7 @@ function addToDB($arr, $timestamp)
     if (json_last_error() != JSON_ERROR_NONE) {
         error_log("json_last_error(): " . json_last_error());
     }
-    $res = memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_JSON), $json) && memcacheSetFixed($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META), array(
+    $res = addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_JSON), $json) && addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META), array(
         'md5' => md5($json),
         'last_modified' => time(),
         'created_timestamp' => $timestamp
