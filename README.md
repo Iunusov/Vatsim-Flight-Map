@@ -13,8 +13,9 @@
 ## Prerequisites: Frontend
 
     $ sudo apt-get update
-    $ sudo apt-get install nodejs npm
-    $ sudo ln -s /usr/bin/nodejs /usr/bin/node
+	$ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+	$ sudo apt-get install -y nodejs
+	$ sudo npm install webpack-cli -g
     $ sudo npm install webpack -g
 
 ## Clonning a repo

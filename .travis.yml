@@ -1,8 +1,9 @@
 language: node_js
 node_js:
-  - "9.11.1"
+  - "8.11.1"
 before_script:
-  - npm install -g webpack-cli webpack
+  - npm install webpack-cli -g
+  - npm install webpack -g
 install:
   - npm install
 script:
