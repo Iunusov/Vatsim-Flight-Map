@@ -31,7 +31,7 @@ var App = function () {
 	}
 	var markerClickListener = function () {
 		var marker = this;
-		requestClientDetails(marker.vatsim_callsign, function (clientDetails) {
+		requestClientDetails(marker.vatsim_callsign, marker.vatsim_cid, function (clientDetails) {
 			openInfoWindow(clientDetails, map, marker);
 		});
 
@@ -41,12 +41,13 @@ var App = function () {
 			polyLine.setMap(null);
 		}
 		closeInfoWindow();
-		infowindow.vatsim_cid = client.cid;
+		infowindow.vatsim_cid = client["cid"];
 		infowindow.setContent(objectToHTML(client));
 		infowindow.open(map, marker);
-		if (client.clienttype === "PILOT" && parseFloat(client["planned_destairport_lat"]) && parseFloat(client["planned_destairport_lon"]) && parseFloat(client["planned_depairport_lat"]) && parseFloat(client["planned_depairport_lon"])) {
+
+		if (client.clienttype === "PILOT" && !isNaN(client["planned_destairport_lat"]) && !isNaN(client["planned_destairport_lon"]) && !isNaN(client["planned_depairport_lat"]) && !isNaN(client["planned_depairport_lon"])) {
 			polyLine = new google.maps.Polyline({
-					path : [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon), ],
+					path : [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon)],
 					strokeColor : "#FF0000",
 					strokeOpacity : 0.8,
 					strokeWeight : 2,
@@ -71,17 +72,18 @@ var App = function () {
 		that.onCloseInfoWindow();
 	}
 
-	var requestClientDetails = function (callsign, cb) {
+	var requestClientDetails = function (callsign, cid, cb) {
 		$.ajax({
 			type : "GET",
 			url : "getcdetails.php",
 			data : {
-				callsign : callsign
+				"callsign" : callsign,
+				"cid": cid
 			},
 			contentType : "application/json",
 			dataType : "json",
-			success : function (data, textStatus, request) {
-				cb(data);
+			success : function (client, textStatus, request) {
+				cb(utils.parseClientDetails(client));
 			}
 		});
 	}
@@ -130,16 +132,23 @@ var App = function () {
 				markersArray = [];
 				that.callSignsArray = [];
 				$.each(data, function (index, client) {
-					var cid = client[0];
+					var cid = parseInt(client[0]);
+					if (isNaN(cid)) {
+						return true;
+					}
 					var callsign = client[1];
 					var clienttype = client[2];
-					var heading = client[3];
-					var latitude = client[4];
-					var longitude = client[5];
+					var heading = parseFloat(client[3]) || 0;
+					var latitude = parseFloat(client[4]);
+					if (isNaN(latitude)) {
+						return true;
+					}
+					var longitude = parseFloat(client[5]);
+					if (isNaN(longitude)) {
+						return true;
+					}
 					that.callSignsArray.push(callsign);
 					var icon = "img/undefined.png";
-					if (!heading)
-						heading = 0;
 					if (clienttype === "PILOT") {
 						icon = "img/planes/" + (360 - Math.round(heading / 20) * 20) + ".png";
 					}
@@ -152,8 +161,8 @@ var App = function () {
 								map : map,
 								title : callsign,
 								icon : icon,
-								vatsim_cid : client[0],
-								vatsim_callsign : client[1]
+								vatsim_cid : cid,
+								vatsim_callsign : callsign
 							})
 							marker.setMap(map);
 						google.maps.event.addListener(marker, 'click', markerClickListener);
@@ -177,7 +186,7 @@ var App = function () {
 	}
 	this.initialize = function (conf) {
 		zoom = parseInt(conf['map_zoom']) || zoom;
-		defaultLocation = new google.maps.LatLng(parseFloat(conf['map_center_lat']) || 44.996883999209636, parseFloat(conf['map_center_lng']) || -18.800782187499979);
+		defaultLocation = new google.maps.LatLng(parseFloat(conf['map_center_lat']) || 44.99688, parseFloat(conf['map_center_lng']) || -18.80078);
 		mapTypeId = _.contains(google.maps.MapTypeId, conf['map_type']) ? conf['map_type'] : google.maps.MapTypeId.TERRAIN;
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
 				zoom : zoom,
@@ -203,8 +212,9 @@ var App = function () {
 		callsign = $.trim(callsign.toUpperCase());
 		for (var i = 0; i < markersArray.length; i++) {
 			var current_calsign = markersArray[i].vatsim_callsign.toUpperCase();
+			var current_cid = markersArray[i].vatsim_cid;;
 			if (current_calsign === callsign) {
-				requestClientDetails(callsign, function (clientDetails) {
+				requestClientDetails(callsign, current_cid, function (clientDetails) {
 					openInfoWindow(clientDetails, map, markersArray[i]);
 				});
 				break;

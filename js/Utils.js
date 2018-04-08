@@ -27,5 +27,15 @@ var Utils = function () {
 		}
 		return str.substring(0, 2) + ":" + str.substring(2, 4);
 	}
+	this.parseClientDetails = function (client) {
+		client["cid"] = parseInt(client["cid"]);
+		client["planned_depairport_lat"] = parseFloat(client["planned_depairport_lat"]);
+		client["planned_depairport_lon"] = parseFloat(client["planned_depairport_lon"]);
+		client["latitude"] = parseFloat(client["latitude"]);
+		client["longitude"] = parseFloat(client["longitude"]);
+		client["planned_destairport_lat"] = parseFloat(client["planned_destairport_lat"]);
+		client["planned_destairport_lon"] = parseFloat(client["planned_destairport_lon"]);
+		return client;
+	}
 }
 module.exports = Utils;

@@ -1,21 +1,10 @@
 <?php
-function exit404()
+function exit404($error)
 {
     header('HTTP/1.0 404 Not Found');
-    die('{}');
-}
-
-function parseIntParam($paramName, $array)
-{
-    if (!is_string($paramName) || !is_array($array) || !array_key_exists($paramName, $array)) {
-        return NULL;
-    }
-    return filter_var($array[$paramName], FILTER_VALIDATE_INT, array(
-        'options' => array(
-            'min_range' => 0
-        ),
-        'flags' => FILTER_NULL_ON_FAILURE
-    ));
+	$content = "{\"error\": \"$error\"}";
+	header("Content-length: " . strlen($content));
+    die($content);
 }
 
 header('Content-type: application/json');
@@ -23,23 +12,28 @@ header('Expires: Sun, 01 Jan 2014 00:00:00 GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Cache-Control: post-check=0, pre-check=0', FALSE);
 header('Pragma: no-cache');
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 
 require('vatsim_parser/config.php');
 
 $callsign = $_GET["callsign"];
+$cid = filter_var($_GET["cid"], FILTER_VALIDATE_INT);
 
 if (empty($callsign)) {
-    exit404();
+    exit404("callsign is empty");
+}
+if ($cid === FALSE) {
+    exit404("cid is empty");
 }
 $details = FALSE;
 $m       = new Memcache;
 if ($m->connect(MEMCACHE_IP, MEMCACHE_PORT)) {
-    $details = $m->get(md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" .$callsign));
+    $details = $m->get(md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $callsign . $cid));
     $m->close();
 }
 
 if (!$details) {
-    exit404();
+    exit404("nof found");
 }
 
 header("Content-length: " . strlen($details));
