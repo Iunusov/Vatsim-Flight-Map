@@ -16,19 +16,15 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 
 require('vatsim_parser/config.php');
 
-$callsign = $_GET["callsign"];
 $cid = filter_var($_GET["cid"], FILTER_VALIDATE_INT);
 
-if (empty($callsign)) {
-    exit404("callsign is empty");
-}
 if ($cid === FALSE) {
     exit404("cid is empty");
 }
 $details = FALSE;
 $m       = new Memcache;
 if ($m->connect(MEMCACHE_IP, MEMCACHE_PORT)) {
-    $details = $m->get(md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $callsign . $cid));
+    $details = $m->get(md5(MEMCACHE_PREFIX_VATSIM . $cid));
     $m->close();
 }
 

@@ -106,7 +106,7 @@ function addToDB($arr, $timestamp)
             $v["longitude"]
         );
         
-        addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . "BY_CALLSIGN" . $v["callsign"] . $v["cid"]), json_encode($v), 0, 60 * 5); //expiration time: 5 minutes
+        addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . $v["cid"]), json_encode($v), 0, 60 * 30); //expiration time: 30 minutes
         if (json_last_error() != JSON_ERROR_NONE) {
             error_log("json_last_error(): " . json_last_error());
             print_r($v);

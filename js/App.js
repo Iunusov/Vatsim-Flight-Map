@@ -32,7 +32,7 @@ var App = function () {
 	}
 	var markerClickListener = function () {
 		var marker = this;
-		requestClientDetails(marker.vatsim_callsign, marker.vatsim_cid, function (clientDetails) {
+		requestClientDetails(marker.vatsim_cid, function (clientDetails) {
 			openInfoWindow(clientDetails, map, marker);
 		});
 	}
@@ -79,12 +79,11 @@ var App = function () {
 		});
 		that.onCloseInfoWindow();
 	}
-	var requestClientDetails = function (callsign, cid, cb) {
+	var requestClientDetails = function (cid, cb) {
 		$.ajax({
 			type : "GET",
 			url : "getcdetails.php",
 			data : {
-				"callsign" : callsign,
 				"cid" : cid
 			},
 			contentType : "application/json",
@@ -167,13 +166,13 @@ var App = function () {
 								title : callsign,
 								icon : icon,
 								vatsim_cid : cid,
-								vatsim_callsign : callsign
+								vatsim_callsign: callsign
 							})
 							marker.setMap(map);
 						google.maps.event.addListener(marker, 'click', markerClickListener);
 						markersArray.push(marker);
 						if (infowindow.vatsim_cid !== null && infowindow.vatsim_cid === cid) {
-							requestClientDetails(callsign, cid, function (clientDetails) {
+							requestClientDetails(cid, function (clientDetails) {
 								infowindow.setContent(objectToHTML(clientDetails));
 							});
 						}
@@ -224,7 +223,7 @@ var App = function () {
 			var current_calsign = markersArray[i].vatsim_callsign.toUpperCase();
 			var current_cid = markersArray[i].vatsim_cid; ;
 			if (current_calsign === callsign) {
-				requestClientDetails(callsign, current_cid, function (clientDetails) {
+				requestClientDetails(current_cid, function (clientDetails) {
 					openInfoWindow(clientDetails, map, markersArray[i]);
 				});
 				break;
