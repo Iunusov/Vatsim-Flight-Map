@@ -181,7 +181,7 @@ var App = function () {
 			pTimeout = false;
 		}
 		var res = that.getClientsFromServer();
-		pTimeout = setTimeout(that.doPoll, 60 * 1000);
+		pTimeout = setTimeout(that.doPoll, 3 * 60 * 1000);
 		return res;
 	}
 	this.initialize = function (conf) {
