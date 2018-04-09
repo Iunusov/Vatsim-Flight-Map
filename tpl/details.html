@@ -1,6 +1,9 @@
 <h6><a href="http://vataware.com/pilot/<%- client.cid %>"><%- client.callsign %> (<%- client.realname %>)</a></h6>
-<p><span class="font-weight-bold"><span class="ui-icon ui-icon-home"></span> <%- client.server %> </span><em>(<%- client.time_logon %>)</em></p>
-<table class="table-responsive table-striped" style="border-collapse: separate;border-spacing: 2px 2px;">
+<table class="table table-dark table-striped">
+<tr>
+<td>Server:</td>
+<td class="text-nowrap font-weight-bold"><%- client.server %></td>
+</tr>
 <% if (client.clienttype === "PILOT") { %>
 <% if(client.planned_depairport && client.planned_destairport) { %>
 <tr>
@@ -28,14 +31,14 @@
 <td>QNH: </td>
 <td class="text-nowrap font-weight-bold"><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></td>
 </tr>
-
-<tr>
 <% if(client.planned_deptime && client.planned_deptime !== "0"){ %>
+<tr>
 <td>Deptime: </td>
 <td class="text-nowrap font-weight-bold"><%- client.planned_deptime %> UTC <span class="text-muted">(planned)</span></td>
 </tr>
 <% } %>
 <% if(client.planned_actdeptime && client.planned_actdeptime !== "0"){ %>
+<tr>
 <td>Deptime: </td>
 <td class="text-nowrap font-weight-bold"><%- client.planned_actdeptime %> UTC <span class="text-muted">(actual)</span></td>
 </tr>
