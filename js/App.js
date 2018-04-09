@@ -8,14 +8,15 @@ var App = function () {
 	var map = false;
 	var markersArray = [];
 	var infowindow = new google.maps.InfoWindow({});
-	var tmpMarkersArray = [];
+	var infowindowMarker = null;
 	var defaultLocation = null;
 	var mapTypeId = null;
 	var zoom = 3;
 	var polyLine = null;
 	var clientTemplate = _.template(require("raw-loader!../tpl/details.html"));
 	var utils = new Utils();
-	var objectToHTML = function (client) {
+	var objectToHTML = function (src) {
+		var client = $.extend({}, src);
 		client["altitude"] = utils.commaSeparateNumber(client["altitude"]);
 		client["time_logon"] = client["time_online"];
 		if (client.clienttype === "PILOT") {
@@ -26,7 +27,7 @@ var App = function () {
 				client["time_last_atis_received"] = utils.formatDate(client["time_last_atis_received"]);
 			}
 		return clientTemplate({
-			client : client
+			"client" : client
 		});
 	}
 	var markerClickListener = function () {
@@ -34,17 +35,18 @@ var App = function () {
 		requestClientDetails(marker.vatsim_callsign, marker.vatsim_cid, function (clientDetails) {
 			openInfoWindow(clientDetails, map, marker);
 		});
-
 	}
 	var openInfoWindow = function (client, map, marker) {
+		if (infowindow.vatsim_cid && infowindow.vatsim_cid === marker.vatsim_cid) {
+			return;
+		}
 		if (polyLine) {
 			polyLine.setMap(null);
 		}
 		closeInfoWindow();
-		infowindow.vatsim_cid = client["cid"];
+		infowindow.vatsim_cid = marker.vatsim_cid;
 		infowindow.setContent(objectToHTML(client));
 		infowindow.open(map, marker);
-
 		if (client.clienttype === "PILOT" && !isNaN(client["planned_destairport_lat"]) && !isNaN(client["planned_destairport_lon"]) && !isNaN(client["planned_depairport_lat"]) && !isNaN(client["planned_depairport_lon"])) {
 			polyLine = new google.maps.Polyline({
 					path : [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon)],
@@ -55,30 +57,35 @@ var App = function () {
 					map : map
 				});
 		}
+		map.setOptions({
+			zoomControl : false,
+			mapTypeControl : false
+		});
 		that.onOpenInfoWindow(client);
 	};
-
 	var closeInfoWindow = function () {
 		infowindow.close();
-		infowindow.setContent("");
-		infowindow.vatsim_cid = -1;
+		infowindow.vatsim_cid = null;
+		if (infowindowMarker) {
+			infowindowMarker.setMap(null);
+		}
+		infowindowMarker = null;
 		if (polyLine) {
 			polyLine.setMap(null);
 		}
-		for (var i = 0; i < tmpMarkersArray.length; i++) {
-			tmpMarkersArray[i].setMap(null);
-		}
-		tmpMarkersArray = [];
+		map.setOptions({
+			zoomControl : true,
+			mapTypeControl : true
+		});
 		that.onCloseInfoWindow();
 	}
-
 	var requestClientDetails = function (callsign, cid, cb) {
 		$.ajax({
 			type : "GET",
 			url : "getcdetails.php",
 			data : {
 				"callsign" : callsign,
-				"cid": cid
+				"cid" : cid
 			},
 			contentType : "application/json",
 			dataType : "json",
@@ -87,7 +94,6 @@ var App = function () {
 			}
 		});
 	}
-
 	this.getMap = function () {
 		return map;
 	}
@@ -120,14 +126,13 @@ var App = function () {
 				}
 				lastModified = lm;
 				for (var i = 0; i < markersArray.length; i++) {
-					if (infowindow.vatsim_cid === markersArray[i].vatsim_cid) {
-						tmpMarkersArray.push(markersArray[i]);
-					} else {
-						google.maps.event.clearInstanceListeners(markersArray[i]);
-						markersArray[i].setMap(null);
-						delete markersArray[i];
+					if (!infowindowMarker && infowindow.vatsim_cid !== null && infowindow.vatsim_cid === markersArray[i].vatsim_cid) {
+						infowindowMarker = markersArray[i];
+						continue;
 					}
-
+					google.maps.event.clearInstanceListeners(markersArray[i]);
+					markersArray[i].setMap(null);
+					delete markersArray[i];
 				}
 				markersArray = [];
 				that.callSignsArray = [];
@@ -167,6 +172,11 @@ var App = function () {
 							marker.setMap(map);
 						google.maps.event.addListener(marker, 'click', markerClickListener);
 						markersArray.push(marker);
+						if (infowindow.vatsim_cid !== null && infowindow.vatsim_cid === cid) {
+							requestClientDetails(callsign, cid, function (clientDetails) {
+								infowindow.setContent(objectToHTML(clientDetails));
+							});
+						}
 					}
 				});
 				that.onReceiveClientsArray(that.callSignsArray);
@@ -212,7 +222,7 @@ var App = function () {
 		callsign = $.trim(callsign.toUpperCase());
 		for (var i = 0; i < markersArray.length; i++) {
 			var current_calsign = markersArray[i].vatsim_callsign.toUpperCase();
-			var current_cid = markersArray[i].vatsim_cid;;
+			var current_cid = markersArray[i].vatsim_cid; ;
 			if (current_calsign === callsign) {
 				requestClientDetails(callsign, current_cid, function (clientDetails) {
 					openInfoWindow(clientDetails, map, markersArray[i]);
