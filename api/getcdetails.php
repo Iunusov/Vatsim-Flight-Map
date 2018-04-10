@@ -12,12 +12,16 @@ function exit404($error)
     die($content);
 }
 $cid = filter_var($_GET['cid'], FILTER_VALIDATE_INT);
+$callsign = $_GET['callsign'];
 if ($cid === FALSE) {
     exit404('cid');
 }
+if(!$callsign){
+	exit404('callsign');
+}
 $m = new Memcache;
 $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-$json = $m->get(md5(MEMCACHE_PREFIX_VATSIM . $cid));
+$json = $m->get(md5(MEMCACHE_PREFIX_VATSIM . $cid . $callsign));
 $m->close();
 if (!strlen($json)) {
     exit404('not found');

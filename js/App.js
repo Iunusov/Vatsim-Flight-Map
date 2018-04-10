@@ -37,9 +37,6 @@ var App = function () {
 		});
 	}
 	var openInfoWindow = function (client, map, marker) {
-		if (infowindow.vatsim_cid && infowindow.vatsim_cid === marker.vatsim_cid) {
-			return;
-		}
 		if (polyLine) {
 			polyLine.setMap(null);
 		}
@@ -85,6 +82,7 @@ var App = function () {
 			url : "api/getcdetails.php",
 			data : {
 				"cid" : marker.vatsim_cid,
+				"callsign" : marker.vatsim_callsign,
 				"timestamp" : timeStamp
 			},
 			contentType : "application/json",
