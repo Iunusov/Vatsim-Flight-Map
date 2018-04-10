@@ -4,7 +4,7 @@ var Utils = require("./Utils.js");
 var App = function () {
 	var that = this;
 	var pTimeout = false;
-	var lastModified = "";
+	var timeStamp = null;
 	var map = false;
 	var markersArray = [];
 	var infowindow = new google.maps.InfoWindow({});
@@ -32,7 +32,7 @@ var App = function () {
 	}
 	var markerClickListener = function () {
 		var marker = this;
-		requestClientDetails(marker.vatsim_cid, function (clientDetails) {
+		requestClientDetails(marker, function (clientDetails) {
 			openInfoWindow(clientDetails, map, marker);
 		});
 	}
@@ -79,12 +79,13 @@ var App = function () {
 		});
 		that.onCloseInfoWindow();
 	}
-	var requestClientDetails = function (cid, cb) {
+	var requestClientDetails = function (marker, cb) {
 		$.ajax({
 			type : "GET",
 			url : "getcdetails.php",
 			data : {
-				"cid" : cid
+				"cid" : marker.vatsim_cid,
+				"timestamp" : timeStamp
 			},
 			contentType : "application/json",
 			dataType : "json",
@@ -117,13 +118,13 @@ var App = function () {
 			url : "getclients.php",
 			contentType : "application/json",
 			dataType : "json",
-			success : function (data, textStatus, request) {
-				var lm = request.getResponseHeader('Last-Modified');
-				if (lm && lm == lastModified) {
+			success : function (result, textStatus, request) {
+				var ts = result.timestamp;
+				if (ts && ts === timeStamp) {
 					dfd.resolve();
 					return dfd.promise();
 				}
-				lastModified = lm;
+				timeStamp = ts;
 				for (var i = 0; i < markersArray.length; i++) {
 					if (!infowindowMarker && infowindow.vatsim_cid !== null && infowindow.vatsim_cid === markersArray[i].vatsim_cid) {
 						infowindowMarker = markersArray[i];
@@ -135,6 +136,7 @@ var App = function () {
 				}
 				markersArray = [];
 				that.callSignsArray = [];
+				var data = result["data"];
 				$.each(data, function (index, client) {
 					var cid = parseInt(client[0]);
 					if (isNaN(cid)) {
@@ -166,13 +168,13 @@ var App = function () {
 								title : callsign,
 								icon : icon,
 								vatsim_cid : cid,
-								vatsim_callsign: callsign
+								vatsim_callsign : callsign,
 							})
 							marker.setMap(map);
 						google.maps.event.addListener(marker, 'click', markerClickListener);
 						markersArray.push(marker);
 						if (infowindow.vatsim_cid !== null && infowindow.vatsim_cid === cid) {
-							requestClientDetails(cid, function (clientDetails) {
+							requestClientDetails(marker, function (clientDetails) {
 								infowindow.setContent(objectToHTML(clientDetails));
 							});
 						}
@@ -190,7 +192,7 @@ var App = function () {
 			pTimeout = false;
 		}
 		var res = that.getClientsFromServer();
-		pTimeout = setTimeout(that.doPoll, 3 * 60 * 1000);
+		pTimeout = setTimeout(that.doPoll, 2 * 60 * 1000);
 		return res;
 	}
 	this.initialize = function (conf) {
@@ -223,7 +225,7 @@ var App = function () {
 			var current_calsign = markersArray[i].vatsim_callsign.toUpperCase();
 			var current_cid = markersArray[i].vatsim_cid; ;
 			if (current_calsign === callsign) {
-				requestClientDetails(current_cid, function (clientDetails) {
+				requestClientDetails(markersArray[i], function (clientDetails) {
 					openInfoWindow(clientDetails, map, markersArray[i]);
 				});
 				break;

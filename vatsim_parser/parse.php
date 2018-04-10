@@ -4,6 +4,15 @@ php_sapi_name() == "cli" or die("<br><strong>This script is not intended to be r
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
+    // error was suppressed with the @-operator
+    if (0 === error_reporting()) {
+        return false;
+    }
+
+    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+});
+
 include("config.php");
 include("Airports.php");
 
@@ -92,19 +101,12 @@ function addToDB($arr, $timestamp)
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-    $clients = array();
+	$clients = array();
     foreach ($arr as $v) {
         if ($v["clienttype"] != "ATC" && $v["clienttype"] != "PILOT") {
             continue;
         }
-        $clients[] = array(
-            $v["cid"],
-            $v["callsign"],
-            $v["clienttype"],
-            $v["heading"],
-            $v["latitude"],
-            $v["longitude"]
-        );
+        $clients[] = array($v["cid"],$v["callsign"],$v["clienttype"],$v["heading"],$v["latitude"],$v["longitude"]);
         
         addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . $v["cid"]), json_encode($v), 0, 60 * 30); //expiration time: 30 minutes
         if (json_last_error() != JSON_ERROR_NONE) {
@@ -112,13 +114,15 @@ function addToDB($arr, $timestamp)
             print_r($v);
         }
     }
-    $json = json_encode($clients);
+	$result = array(
+	  "timestamp" => $timestamp,
+	  "data" => $clients
+    );
+    $json = json_encode($result);
     if (json_last_error() != JSON_ERROR_NONE) {
         error_log("json_last_error(): " . json_last_error());
     }
     $res = addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_JSON), $json) && addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META), array(
-        'md5' => md5($json),
-        'last_modified' => time(),
         'created_timestamp' => $timestamp
     ));
     $m->close();
@@ -147,6 +151,7 @@ function trytoparse($url)
     }
     $clients   = "";
     $timestamp = parseCreatedTimeStamp($data);
+
     if (!$timestamp) {
         error_log('parseCreatedTimeStamp() fails.');
         return false;
@@ -182,7 +187,12 @@ function trytoparse($url)
     foreach ($clients as $key => $item) {
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
+		try{
 		$combined = array_combine($tpl_array, $cl_array);
+		}
+		catch (ErrorException $e){
+			continue;
+		}
 		if($combined && is_array($combined)){
 			$clients_final[$key] = $combined;
 			$clients_final[$key]["time_online"] = getLogonTime($clients_final[$key]["time_logon"]);
