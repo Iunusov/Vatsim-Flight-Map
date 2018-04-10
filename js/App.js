@@ -82,7 +82,7 @@ var App = function () {
 	var requestClientDetails = function (marker, cb) {
 		$.ajax({
 			type : "GET",
-			url : "getcdetails.php",
+			url : "api/getcdetails.php",
 			data : {
 				"cid" : marker.vatsim_cid,
 				"timestamp" : timeStamp
@@ -115,7 +115,7 @@ var App = function () {
 		var dfd = $.Deferred();
 		$.ajax({
 			type : "GET",
-			url : "getclients.php",
+			url : "api/getclients.php",
 			contentType : "application/json",
 			dataType : "json",
 			success : function (result, textStatus, request) {

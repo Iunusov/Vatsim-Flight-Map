@@ -1,5 +1,5 @@
 <?php
-require('vatsim_parser/config.php');
+require('../config.php');
 header('Content-type: application/json');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + CACHE_LIFETIME_SECONDS));

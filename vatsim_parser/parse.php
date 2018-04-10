@@ -13,7 +13,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontex
     throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
-include("config.php");
+include("../config.php");
 include("Airports.php");
 
 define ("EOL_VATSIM_", "\n");
