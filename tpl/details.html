@@ -50,10 +50,10 @@
 </tr>
 <% } %>
 <% if(client.planned_remarks){ %>
-<tr><td  colspan="2"><details><summary>Remarks</summary><code><%- client.planned_remarks %></code></details></td></tr>
+<tr><td  colspan="2"><details><summary>Remarks</summary><div class="alert alert-info"><pre><%- client.planned_remarks %></pre></div></details></td></tr>
 <% } %>
 <% if(client.planned_route){ %>
-<tr><td  colspan="2"><details><summary>Route</summary><code><%- client.planned_route %></code></details></td></tr>
+<tr><td  colspan="2"><details><summary>Route</summary><div class="alert alert-info"><pre><%- client.planned_route %></pre></div></details></td></tr>
 <% } %>
 <% } %>
 <% if (client.clienttype === "ATC") { %>

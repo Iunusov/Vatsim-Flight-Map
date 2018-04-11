@@ -175,7 +175,7 @@ function trytoparse($url)
     $clients_final = array();
     $tpl_array     = explode(":", trim($clients_tpl[1]));
     
-    foreach ($clients as $key => $item) {
+    foreach ($clients as $item) {
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
 		$combined = @array_combine($tpl_array, $cl_array);
@@ -183,8 +183,11 @@ function trytoparse($url)
                   continue;
                 }
 		if($combined && is_array($combined)){
-			$clients_final[$key] = $combined;
-			$clients_final[$key]["time_online"] = getLogonTime($clients_final[$key]["time_logon"]);
+
+		     $combined["planned_remarks"] = wordwrap( $combined["planned_remarks"], 40);
+                     $combined["planned_route"] = wordwrap($combined["planned_route"],40);
+                     $combined["atis_message"] = wordwrap($combined["atis_message"], 40);	
+                     $clients_final[] = $combined;
 		}
     }
     
