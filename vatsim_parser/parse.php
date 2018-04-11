@@ -4,15 +4,6 @@ php_sapi_name() == "cli" or die("<br><strong>This script is not intended to be r
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
-    // error was suppressed with the @-operator
-    if (0 === error_reporting()) {
-        return false;
-    }
-
-    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-});
-
 include("../config.php");
 include("Airports.php");
 
@@ -187,12 +178,10 @@ function trytoparse($url)
     foreach ($clients as $key => $item) {
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
-		try{
-		$combined = array_combine($tpl_array, $cl_array);
-		}
-		catch (ErrorException $e){
-			continue;
-		}
+		$combined = @array_combine($tpl_array, $cl_array);
+                if(!$combined){
+                  continue;
+                }
 		if($combined && is_array($combined)){
 			$clients_final[$key] = $combined;
 			$clients_final[$key]["time_online"] = getLogonTime($clients_final[$key]["time_logon"]);
