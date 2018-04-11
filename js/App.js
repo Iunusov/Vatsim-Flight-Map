@@ -82,8 +82,7 @@ var App = function () {
 			url : "api/getcdetails.php",
 			data : {
 				"cid" : marker.vatsim_cid,
-				"callsign" : marker.vatsim_callsign,
-				"timestamp" : timeStamp
+				"callsign" : marker.vatsim_callsign
 			},
 			contentType : "application/json",
 			dataType : "json",
