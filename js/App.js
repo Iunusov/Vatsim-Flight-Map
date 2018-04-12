@@ -42,6 +42,7 @@ var App = function () {
 		}
 		closeInfoWindow();
 		infowindow.vatsim_cid = marker.vatsim_cid;
+		infowindow.vatsim_callsign = marker.vatsim_callsign;
 		infowindow.setContent(objectToHTML(client));
 		infowindow.open(map, marker);
 		if (client.clienttype === "PILOT" && !isNaN(client["planned_destairport_lat"]) && !isNaN(client["planned_destairport_lon"]) && !isNaN(client["planned_depairport_lat"]) && !isNaN(client["planned_depairport_lon"])) {
@@ -63,6 +64,7 @@ var App = function () {
 	var closeInfoWindow = function () {
 		infowindow.close();
 		infowindow.vatsim_cid = null;
+		infowindow.vatsim_callsign = null;
 		if (infowindowMarker) {
 			infowindowMarker.setMap(null);
 		}
@@ -126,7 +128,7 @@ var App = function () {
 				}
 				timeStamp = ts;
 				for (var i = 0; i < markersArray.length; i++) {
-					if (!infowindowMarker && infowindow.vatsim_cid !== null && infowindow.vatsim_cid === markersArray[i].vatsim_cid) {
+					if (!infowindowMarker && infowindow.vatsim_cid === markersArray[i].vatsim_cid && infowindow.vatsim_callsign === markersArray[i].vatsim_callsign) {
 						infowindowMarker = markersArray[i];
 						continue;
 					}
@@ -173,7 +175,7 @@ var App = function () {
 							marker.setMap(map);
 						google.maps.event.addListener(marker, 'click', markerClickListener);
 						markersArray.push(marker);
-						if (infowindow.vatsim_cid !== null && infowindow.vatsim_cid === cid) {
+						if (infowindow.vatsim_cid === cid && infowindow.vatsim_callsign === callsign) {
 							requestClientDetails(marker, function (clientDetails) {
 								infowindow.setContent(objectToHTML(clientDetails));
 							});
