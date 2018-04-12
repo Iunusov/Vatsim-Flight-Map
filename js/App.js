@@ -78,11 +78,13 @@ var App = function () {
 	}
 	var requestClientDetails = function (marker, cb) {
 		$.ajax({
+			timeout : 5000,
 			type : "GET",
 			url : "api/getcdetails.php",
 			data : {
 				"cid" : marker.vatsim_cid,
-				"callsign" : marker.vatsim_callsign
+				"callsign" : marker.vatsim_callsign,
+				"ts" : timeStamp
 			},
 			contentType : "application/json",
 			dataType : "json",
@@ -111,6 +113,7 @@ var App = function () {
 	this.getClientsFromServer = function () {
 		var dfd = $.Deferred();
 		$.ajax({
+			timeout : 5000,
 			type : "GET",
 			url : "api/getclients.php",
 			contentType : "application/json",
@@ -119,7 +122,7 @@ var App = function () {
 				var ts = result.timestamp;
 				if (ts && ts === timeStamp) {
 					dfd.resolve();
-					return dfd.promise();
+					return;
 				}
 				timeStamp = ts;
 				for (var i = 0; i < markersArray.length; i++) {
@@ -179,18 +182,25 @@ var App = function () {
 				});
 				that.onReceiveClientsArray(that.callSignsArray);
 				dfd.resolve();
+			},
+			error : function () {
+				dfd.reject();
 			}
 		});
 		return dfd.promise();
 	};
-	this.doPoll = function () {
-		if (pTimeout) {
-			clearTimeout(pTimeout);
-			pTimeout = false;
-		}
-		var res = that.getClientsFromServer();
-		pTimeout = setTimeout(that.doPoll, 2 * 60 * 1000);
-		return res;
+	this.doPoll = function (success_cb) {
+		(that.getClientsFromServer()).done(function () {
+			if (success_cb) {
+				success_cb();
+			}
+		}).always(function () {
+			if (pTimeout) {
+				clearTimeout(pTimeout);
+				pTimeout = false;
+			}
+			pTimeout = setTimeout(that.doPoll, 2 * 60 * 1000);
+		});
 	}
 	this.initialize = function (conf) {
 		zoom = parseInt(conf['map_zoom']) || zoom;

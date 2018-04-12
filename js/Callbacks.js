@@ -13,7 +13,7 @@ var Callbacks = function (app_) {
 		}
 		app.initialize(conf);
 		bindHandlers();
-		app.doPoll().then(function () {
+		app.doPoll(function () {
 			var callSign = app.getUrlParam("c", document.URL);
 			if (callSign) {
 				app.searchForCallsign(callSign);
