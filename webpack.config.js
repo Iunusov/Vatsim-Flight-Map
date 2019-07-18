@@ -32,7 +32,10 @@ module.exports = {
 				test : /\.(png)$/i,
 				loader : 'url-loader?limit=100000'
 			},
-		]
+			{
+				test: /\.html$/,
+				use: [ {loader: 'html-loader',}],
+			}]
 	},
 	plugins : [new webpack.ProvidePlugin({
 			$ : "jquery",
