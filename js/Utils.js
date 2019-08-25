@@ -65,5 +65,16 @@ var Utils = function () {
         var results = regex.exec(url);
         return results == null ? null : results[1];
     }
+
+    //The numbers are in decimal degrees format and range from -90 to 90 for latitude and -180 to 180 for longitude.
+    this.validateLngLat = function (lng, lat) {
+        if (lat > 90 || lat < -90) {
+            return false;
+        }
+        if (lng > 180 || lng < -180) {
+            return false;
+        }
+        return true;
+    }
 }
 module.exports = Utils;

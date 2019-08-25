@@ -11,16 +11,24 @@ var Callbacks = function () {
         if (("localStorage" in window) && window["localStorage"] != null) {
             conf["map_center_lat"] = localStorage.getItem("map_center_lat");
             conf["map_center_lng"] = localStorage.getItem("map_center_lng");
-			
-			
             conf["map_zoom"] = localStorage.getItem("map_zoom");
             conf["map_type"] = localStorage.getItem("map_type");
         }
         var defaultLocation = [parseFloat(conf['map_center_lng']) || 27.3731, parseFloat(conf['map_center_lat']) || 36.0744];
         var zoom = parseFloat(conf['map_zoom']) || 2.0244;
+        var styles = ["mapbox://styles/mapbox/navigation-preview-day-v4", "mapbox://styles/mapbox/light-v10", "mapbox://styles/mapbox/navigation-preview-night-v4", "mapbox://styles/mapbox/outdoors-v11", "mapbox://styles/mapbox/satellite-v9"];
+        if (localStorage.getItem('map_style_idx') === null) {
+            localStorage.setItem('map_style_idx', 0);
+        }
+        var idx = parseInt(localStorage.getItem('map_style_idx'));
+        if (idx == styles.length - 1) {
+            localStorage.setItem('map_style_idx', 0);
+        } else {
+            localStorage.setItem('map_style_idx', idx + 1);
+        }
         map = new mapboxgl.Map({
                 container: 'map',
-                style: 'mapbox://styles/mapbox/outdoors-v11',
+                style: styles[idx],
                 center: defaultLocation,
                 zoom: zoom
             });
@@ -31,7 +39,7 @@ var Callbacks = function () {
                 } else {
                     app = new App(conf, map);
                     bindHandlers();
-                    app.doPoll(function () {
+                    app.startPolling(function () {
                         var callSign = utils.getUrlParam("c", document.URL);
                         if (callSign) {
                             app.searchForCallsign(callSign);
@@ -117,9 +125,7 @@ var Callbacks = function () {
         window.onbeforeunload = function (e) {
             saveParamsToLocalStorage(app, inputCallsign.val());
         };
-        $(window).focus(function () {
-            app.doPoll();
-        });
+
         document.addEventListener("click", function (e) {
             var el = e.target;
             if (el.classList.contains("marker")) {

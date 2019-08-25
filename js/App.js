@@ -11,7 +11,7 @@ var App = function (conf, map_) {
     var timeStamp = null;
     var markersArray = [];
     var infowindow = new mapboxgl.Popup({
-            className: 'popups'
+            maxWidth: "500px"
         });
     this.getMap = function () {
         return map;
@@ -22,7 +22,7 @@ var App = function (conf, map_) {
         infowindow.setLngLat([longitude, latitude]).setHTML(utils.objectToHTML(client)).addTo(map);
         that.onOpenInfoWindow(client);
         if (client.clienttype === "PILOT" && !isNaN(client["planned_destairport_lat"]) && !isNaN(client["planned_destairport_lon"]) && !isNaN(client["planned_depairport_lat"]) && !isNaN(client["planned_depairport_lon"])) {
-            polyLine.draw(map, "route", [[client.planned_depairport_lon, client.planned_depairport_lat], [client.longitude, client.latitude], [client.planned_destairport_lon, client.planned_destairport_lat], ]);
+            polyLine.draw(map, "route", [[client.planned_depairport_lon, client.planned_depairport_lat], [client.planned_destairport_lon, client.planned_destairport_lat]]);
         }
     };
     infowindow.on('close', function (e) {
@@ -59,6 +59,7 @@ var App = function (conf, map_) {
             dataType: "json",
             success: function (result, textStatus, request) {
                 var ts = result.timestamp;
+                console.log(ts);
                 if (ts && ts === timeStamp) {
                     dfd.resolve();
                     return;
@@ -85,6 +86,9 @@ var App = function (conf, map_) {
                     }
                     var longitude = parseFloat(client[5]);
                     if (isNaN(longitude)) {
+                        return true;
+                    }
+                    if (!utils.validateLngLat(longitude, latitude)) {
                         return true;
                     }
                     that.callSignsArray.push(callsign);
@@ -118,7 +122,7 @@ var App = function (conf, map_) {
         });
         return dfd.promise();
     };
-    this.doPoll = function (success_cb) {
+    this.startPolling = function (success_cb) {
         (that.getClientsFromServer()).done(function () {
             if (success_cb) {
                 success_cb();
@@ -128,7 +132,7 @@ var App = function (conf, map_) {
                 clearTimeout(pTimeout);
                 pTimeout = false;
             }
-            pTimeout = setTimeout(that.doPoll, 2 * 60 * 1000);
+            pTimeout = setTimeout(that.startPolling, 60 * 1000);
         });
     }
     this.searchForCallsign = function (callsign) {
