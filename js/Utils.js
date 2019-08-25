@@ -1,11 +1,15 @@
 "use strict";
+var _ = require('underscore');
 var Utils = function () {
+    var that = this;
+    //20170104045956 => 04:59:56
     this.formatDate = function (str) {
         if (!str || str.length != 14 || !parseInt(str)) {
             return str;
         }
         return str.substring(8, 10) + ":" + str.substring(10, 12) + ":" + str.substring(12, 14);
     }
+    //34098 => 34,098
     this.commaSeparateNumber = function (val) {
         if (!parseInt(val)) {
             return val;
@@ -15,6 +19,7 @@ var Utils = function () {
         }
         return val;
     }
+    //520 => 05:20
     this.formatDepTime = function (str) {
         if (!parseInt(str)) {
             return str;
@@ -33,6 +38,32 @@ var Utils = function () {
         client["planned_destairport_lat"] = parseFloat(client["planned_destairport_lat"]);
         client["planned_destairport_lon"] = parseFloat(client["planned_destairport_lon"]);
         return client;
+    }
+    var clientTemplate = _.template(require("../tpl/details.html"));
+    this.objectToHTML = function (src) {
+        var client = $.extend({}, src);
+        client["altitude"] = that.commaSeparateNumber(client["altitude"]);
+        client["time_logon"] = client["time_online"];
+        if (client.clienttype === "PILOT") {
+            client["planned_deptime"] = that.formatDepTime(client["planned_deptime"]);
+            client["planned_actdeptime"] = that.formatDepTime(client["planned_actdeptime"]);
+        } else
+            if (client.clienttype === "ATC") {
+                client["time_last_atis_received"] = that.formatDate(client["time_last_atis_received"]);
+            }
+        return clientTemplate({
+            "client": client
+        });
+    }
+    this.getUrlParam = function (name, url) {
+        if (!url) {
+            url = location.href;
+        }
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regexS = "[\\?&]" + name + "=([^&#]*)";
+        var regex = new RegExp(regexS);
+        var results = regex.exec(url);
+        return results == null ? null : results[1];
     }
 }
 module.exports = Utils;

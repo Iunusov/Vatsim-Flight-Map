@@ -1,6 +1,6 @@
 {
 	"name": "vatmap",
-	"description": "Vatsim aircrafts and ATC on Google Maps.",
+	"description": "Vatsim aircrafts and ATC on Mapbox.",
 	"homepage": "https://github.com/Iunusov/Vatsim-Flight-Map",
 	"author": "Artur Iunusov <iunusov.artur@gmail.com>",
 	"version": "0.0.1",
@@ -14,7 +14,7 @@
 	"keywords": [
 		"vatsim",
 		"vatmap",
-		"google",
+		"mapbox",
 		"map"
 	],
 	"private": true,

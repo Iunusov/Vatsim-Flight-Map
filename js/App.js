@@ -1,91 +1,42 @@
 "use strict";
 var _ = require('underscore');
 var Utils = require("./Utils.js");
-var App = function () {
+var PolyLine = require("./PolyLine.js");
+var App = function (conf, map_) {
+    var utils = new Utils();
+    var polyLine = new PolyLine();
     var that = this;
+    var map = map_;
     var pTimeout = false;
     var timeStamp = null;
-    var map = false;
     var markersArray = [];
-    var infowindow = new google.maps.InfoWindow({});
-    var infowindowMarker = null;
-    var defaultLocation = null;
-    var mapTypeId = null;
-    var zoom = 3;
-    var polyLine = null;
-    var clientTemplate = _.template(require("../tpl/details.html"));
-    var utils = new Utils();
-    var objectToHTML = function (src) {
-        var client = $.extend({}, src);
-        client["altitude"] = utils.commaSeparateNumber(client["altitude"]);
-        client["time_logon"] = client["time_online"];
-        if (client.clienttype === "PILOT") {
-            client["planned_deptime"] = utils.formatDepTime(client["planned_deptime"]);
-            client["planned_actdeptime"] = utils.formatDepTime(client["planned_actdeptime"]);
-        } else
-            if (client.clienttype === "ATC") {
-                client["time_last_atis_received"] = utils.formatDate(client["time_last_atis_received"]);
-            }
-        return clientTemplate({
-            "client": client
+    var infowindow = new mapboxgl.Popup({
+            className: 'popups'
         });
+    this.getMap = function () {
+        return map;
     }
-    var markerClickListener = function () {
-        var marker = this;
-        requestClientDetails(marker, function (clientDetails) {
-            openInfoWindow(clientDetails, map, marker);
-        });
-    }
-    var openInfoWindow = function (client, map, marker) {
-        if (polyLine) {
-            polyLine.setMap(null);
-        }
-        closeInfoWindow();
-        infowindow.vatsim_cid = marker.vatsim_cid;
-        infowindow.vatsim_callsign = marker.vatsim_callsign;
-        infowindow.setContent(objectToHTML(client));
-        infowindow.open(map, marker);
-        if (client.clienttype === "PILOT" && !isNaN(client["planned_destairport_lat"]) && !isNaN(client["planned_destairport_lon"]) && !isNaN(client["planned_depairport_lat"]) && !isNaN(client["planned_depairport_lon"])) {
-            polyLine = new google.maps.Polyline({
-                    path: [new google.maps.LatLng(client.planned_depairport_lat, client.planned_depairport_lon), new google.maps.LatLng(client.latitude, client.longitude), new google.maps.LatLng(client.planned_destairport_lat, client.planned_destairport_lon)],
-                    strokeColor: "#FF0000",
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    geodesic: true,
-                    map: map
-                });
-        }
-        map.setOptions({
-            zoomControl: false,
-            mapTypeControl: false
-        });
+    this.callSignsArray = [];
+    this.openInfoWindow = function (longitude, latitude, client) {
+        polyLine.clear(map, "route");
+        infowindow.setLngLat([longitude, latitude]).setHTML(utils.objectToHTML(client)).addTo(map);
         that.onOpenInfoWindow(client);
+        if (client.clienttype === "PILOT" && !isNaN(client["planned_destairport_lat"]) && !isNaN(client["planned_destairport_lon"]) && !isNaN(client["planned_depairport_lat"]) && !isNaN(client["planned_depairport_lon"])) {
+            polyLine.draw(map, "route", [[client.planned_depairport_lon, client.planned_depairport_lat], [client.longitude, client.latitude], [client.planned_destairport_lon, client.planned_destairport_lat], ]);
+        }
     };
-    var closeInfoWindow = function () {
-        infowindow.close();
-        infowindow.vatsim_cid = null;
-        infowindow.vatsim_callsign = null;
-        if (infowindowMarker) {
-            infowindowMarker.setMap(null);
-        }
-        infowindowMarker = null;
-        if (polyLine) {
-            polyLine.setMap(null);
-        }
-        map.setOptions({
-            zoomControl: true,
-            mapTypeControl: true
-        });
+    infowindow.on('close', function (e) {
+        polyLine.clear(map, "route");
         that.onCloseInfoWindow();
-    }
-    var requestClientDetails = function (marker, cb) {
+    });
+    this.requestClientDetails = function (cid, callsign, cb) {
         $.ajax({
             timeout: 5000,
             type: "GET",
             url: "api/getcdetails.php",
             data: {
-                "cid": marker.vatsim_cid,
-                "callsign": marker.vatsim_callsign,
+                "cid": cid,
+                "callsign": callsign,
                 "ts": timeStamp
             },
             contentType: "application/json",
@@ -95,23 +46,9 @@ var App = function () {
             }
         });
     }
-    this.getMap = function () {
-        return map;
-    }
     this.onOpenInfoWindow = function () {};
     this.onCloseInfoWindow = function () {};
     this.onReceiveClientsArray = function () {};
-    this.callSignsArray = [];
-    this.getUrlParam = function (name, url) {
-        if (!url) {
-            url = location.href;
-        }
-        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-        var regexS = "[\\?&]" + name + "=([^&#]*)";
-        var regex = new RegExp(regexS);
-        var results = regex.exec(url);
-        return results == null ? null : results[1];
-    }
     this.getClientsFromServer = function () {
         var dfd = $.Deferred();
         $.ajax({
@@ -128,12 +65,7 @@ var App = function () {
                 }
                 timeStamp = ts;
                 for (var i = 0; i < markersArray.length; i++) {
-                    if (!infowindowMarker && infowindow.vatsim_cid === markersArray[i].vatsim_cid && infowindow.vatsim_callsign === markersArray[i].vatsim_callsign) {
-                        infowindowMarker = markersArray[i];
-                        continue;
-                    }
-                    google.maps.event.clearInstanceListeners(markersArray[i]);
-                    markersArray[i].setMap(null);
+                    markersArray[i].remove();
                     delete markersArray[i];
                 }
                 markersArray = [];
@@ -164,22 +96,17 @@ var App = function () {
                         icon = "img/control.png";
                     }
                     if (clienttype === "PILOT" || clienttype === "ATC") {
-                        var marker = new google.maps.Marker({
-                                position: new google.maps.LatLng(latitude, longitude),
-                                map: map,
-                                title: callsign,
-                                icon: icon,
-                                vatsim_cid: cid,
-                                vatsim_callsign: callsign,
-                            })
-                            marker.setMap(map);
-                        google.maps.event.addListener(marker, 'click', markerClickListener);
+                        var el = document.createElement('div');
+                        el.className = 'marker';
+                        el.style.backgroundImage = 'url(' + icon + ')';
+                        el.setAttribute('data-lt', longitude);
+                        el.setAttribute('data-lg', latitude);
+                        el.setAttribute('data-cid', cid);
+                        el.setAttribute('data-callsign', callsign);
+                        var marker = new mapboxgl.Marker(el).setLngLat([longitude, latitude]).addTo(map);
+                        marker["vatsim_cid"] = cid;
+                        marker["vatsim_callsign"] = callsign;
                         markersArray.push(marker);
-                        if (infowindow.vatsim_cid === cid && infowindow.vatsim_callsign === callsign) {
-                            requestClientDetails(marker, function (clientDetails) {
-                                infowindow.setContent(objectToHTML(clientDetails));
-                            });
-                        }
                     }
                 });
                 that.onReceiveClientsArray(that.callSignsArray);
@@ -204,38 +131,18 @@ var App = function () {
             pTimeout = setTimeout(that.doPoll, 2 * 60 * 1000);
         });
     }
-    this.initialize = function (conf) {
-        zoom = parseInt(conf['map_zoom']) || zoom;
-        defaultLocation = new google.maps.LatLng(parseFloat(conf['map_center_lat']) || 44.99688, parseFloat(conf['map_center_lng']) || -18.80078);
-        mapTypeId = _.contains(google.maps.MapTypeId, conf['map_type']) ? conf['map_type'] : google.maps.MapTypeId.TERRAIN;
-        map = new google.maps.Map(document.getElementById("map_canvas"), {
-                zoom: zoom,
-                center: defaultLocation,
-                disableDefaultUI: true,
-                mapTypeId: mapTypeId,
-                streetViewControl: false,
-                mapTypeControl: true,
-                zoomControl: true,
-                mapTypeControlOptions: {
-                    style: google.maps.MapTypeControlStyle.DEFAULT,
-                    position: google.maps.ControlPosition.LEFT_BOTTOM
-                }
-            });
-        google.maps.event.addListener(infowindow, 'closeclick', function () {
-            closeInfoWindow();
-        });
-        google.maps.event.addListener(map, 'click', function () {
-            closeInfoWindow();
-        });
-    };
     this.searchForCallsign = function (callsign) {
         callsign = $.trim(callsign.toUpperCase());
         for (var i = 0; i < markersArray.length; i++) {
             var current_calsign = markersArray[i].vatsim_callsign.toUpperCase();
-            var current_cid = markersArray[i].vatsim_cid; ;
+            var cid = markersArray[i].vatsim_cid; ;
             if (current_calsign === callsign) {
-                requestClientDetails(markersArray[i], function (clientDetails) {
-                    openInfoWindow(clientDetails, map, markersArray[i]);
+                that.requestClientDetails(cid, callsign, function (clientDetails) {
+                    var coords = markersArray[i].getLngLat();
+                    map.flyTo({
+                        center: coords
+                    });
+                    that.openInfoWindow(coords.lng, coords.lat, clientDetails, markersArray[i]);
                 });
                 break;
             }

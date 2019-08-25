@@ -8,30 +8,43 @@
     <!--[if lt IE 9]>
   <script src="lib/html5shiv.js"></script>
 <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="keywords" content="VATSIM,flight,map,online,vatmap">
-    <meta name="description" content="VATSIM aircrafts and ATC on the Google Maps. Updated every 2 min. Track your virtual flight online!">
+    <meta name="description" content="VATSIM Online Map. Updated every 2 min. Track your virtual flight online!">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" sizes="192x192" href="icon.png">
-    <style type="text/css">
-        html {
-            height: 100%
-        }
-        
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
         body {
-            height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
         }
         
-        #map_canvas {
-            height: 100%;
-            width: 100%;
+        #map {
             position: absolute;
             top: 0;
-            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .marker {
+            display: block;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            height: 30px;
+            width: 30px;
+            background-repeat: no-repeat;
+        }
+        
+        .popups {
+            display: table;
+            width: auto;
+            margin: 5px;
+            padding: 2px;
         }
         
         .ui-autocomplete {
@@ -60,8 +73,8 @@
             </div>
         </div>
     </div>
-    <div id="map_canvas">
-    </div>
+
+    <div id='map'></div>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/Iunusov/Vatsim-Flight-Map.svg?branch=master)](https://travis-ci.org/Iunusov/Vatsim-Flight-Map)
 
 # Vatsim Flight Map
-[Vatsim](https://wikipedia.org/wiki/VATSIM) aircrafts and ATC on Google Maps.
+[Vatsim](https://wikipedia.org/wiki/VATSIM) aircrafts and ATC on Mapbox.
 
 ![Vatsim Flight Map](https://raw.githubusercontent.com/Iunusov/Vatsim-Flight-Map/master/img/mobileview.png "Vatsim Flight Map")
 
@@ -29,8 +29,8 @@
 
 ## Build
 
-Request API key for Google Maps:
-https://developers.google.com/maps/documentation/javascript/get-api-key
+Request API key for maps:
+https://docs.mapbox.com/help/glossary/access-token/
 
 after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-Flight-Map/blob/master/prod.js) file.
 
