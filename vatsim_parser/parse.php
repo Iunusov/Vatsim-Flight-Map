@@ -6,6 +6,7 @@ ini_set('display_errors', 1);
 include("../config.php");
 include("Airports.php");
 define("EOL_VATSIM_", "\n");
+
 function getServers(){
 	$filename = "./vatsim_servers.json";
 	if(file_exists($filename) && (time() - filemtime($filename)) < 12 * 60 * 60){
@@ -206,16 +207,19 @@ function trytoparse($url)
         if ($dep) {
             $clients_final[$k]["planned_depairport_lat"] = $dep[6];
             $clients_final[$k]["planned_depairport_lon"] = $dep[7];
+			$clients_final[$k]["planned_depairport_name_"] = $dep[1];
+			$clients_final[$k]["planned_depairport_country_"] = $dep[3];
+			$clients_final[$k]["planned_depairport_city_"] = $dep[2];
+			$clients_final[$k]["planned_depairport_id_"] = $dep[0];
         }
         if ($dest) {
             $clients_final[$k]["planned_destairport_lat"] = $dest[6];
             $clients_final[$k]["planned_destairport_lon"] = $dest[7];
+			$clients_final[$k]["planned_destairport_name_"] = $dest[1];
+			$clients_final[$k]["planned_destairport_country_"] = $dest[3];
+			$clients_final[$k]["planned_destairport_city_"] = $dest[2];
+			$clients_final[$k]["planned_destairport_id_"] = $dest[0];
         }
-		$clients_final[$k]["planned_depairport_name_"] = $dep[1];
-		$clients_final[$k]["planned_destairport_name_"] = $dest[1];
-		
-		$clients_final[$k]["planned_depairport_country_"] = $dep[3];
-		$clients_final[$k]["planned_destairport_country_"] = $dest[3];
     }
     addToDB($clients_final, $timestamp);
     return true;

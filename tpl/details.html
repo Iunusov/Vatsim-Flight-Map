@@ -1,31 +1,29 @@
 <h6><%- client.callsign %> (<%- client.realname %>)</h6>
 <table class="table table-sm table-bordered table-striped">
 
-<% if(client.planned_depairport_name_) {%>
+<% if(client.planned_depairport_id_) {%>
 <tr>
 <td class="text-nowrap">Departure: </td>
-<td class="text-nowrap font-weight-bold"><%- client.planned_depairport_name_ %><br><span class="text-muted">(<%- client.planned_depairport_country_ %>)</span></td>
+<td class="text-nowrap font-weight-bold"><span class="badge badge-secondary"><%- client.planned_depairport %></span> <%- client.planned_depairport_city_ %>, <%- client.planned_depairport_country_ %><br><span class="text-muted">(<%- client.planned_depairport_name_ %>)</span></td>
 </tr>
 <% } %>
-<% if(client.planned_destairport_name_) {%>
+<% if(client.planned_destairport_id_) {%>
 <tr>
 <td class="text-nowrap">Arrival: </td>
-<td class="text-nowrap font-weight-bold"><%- client.planned_destairport_name_ %><br><span class="text-muted">(<%- client.planned_destairport_country_ %>)</span></td>
+<td class="text-nowrap font-weight-bold"><span class="badge badge-secondary"><%- client.planned_destairport %></span> <%- client.planned_destairport_city_ %>, <%- client.planned_destairport_country_ %><br><span class="text-muted">(<%- client.planned_destairport_name_ %>)</span></td>
 </tr>
 <% } %>
-
-
 <tr>
 <td>Server:</td>
 <td class="text-nowrap font-weight-bold"><%- client.server %></td>
 </tr>
-<% if (client.clienttype === "PILOT") { %>
-<% if(client.planned_depairport && client.planned_destairport) { %>
+<% if(client.planned_altairport) { %>
 <tr>
-<td>Path: </td>
-<td class="text-nowrap font-weight-bold"><%- client.planned_depairport %> <span class="ui-icon ui-icon-arrowthick-1-e"></span> <%- client.planned_destairport %> <% if(client.planned_altairport){ %><span class="text-muted">(alt: <%- client.planned_altairport %>)</span><% } %></td>
+<td>Altairport: </td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_altairport %></td>
 </tr>
 <% } %>
+<% if (client.clienttype === "PILOT") { %>
 <tr>
 <td>Aircraft: </td>
 <td class="text-nowrap font-weight-bold"><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></td>
@@ -87,7 +85,7 @@
 </tr>
 <% } %>
 <% if(client.atis_message){ %>
-<tr><td  colspan="2"><details open="open"><summary>ATIS message</summary><div class="alert alert-info"><pre><%- client.atis_message %>
+<tr><td  colspan="2"><details open="open"><summary>ATIS message</summary><div class="alert alert-light"><pre><%- client.atis_message %>
 </pre></div>
 </details></td></tr>
 <% } %>
