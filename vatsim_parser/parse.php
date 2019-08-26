@@ -6,6 +6,22 @@ ini_set('display_errors', 1);
 include("../config.php");
 include("Airports.php");
 define("EOL_VATSIM_", "\n");
+function getServers(){
+	$filename = "./vatsim_servers.json";
+	if(file_exists($filename) && (time() - filemtime($filename)) < 12 * 60 * 60){
+		return;
+	}
+	$statusURL = "http://status.vatsim.net/";
+	$content = str_replace("\r\n", "\n", file_get_contents($statusURL));
+	$servers = false;
+	preg_match_all("/url0=(.*)/", $content, $servers);
+	if(count(json_decode(json_encode($servers[1]), true)) <= 0){
+		error_log("can't get servers list from $statusURL");
+		die();
+	}
+	file_put_contents($filename, json_encode($servers[1]) . PHP_EOL, LOCK_EX);
+}
+
 function getLogonTime($str)
 {
     if (strlen($str) != 14) {
@@ -141,9 +157,6 @@ function trytoparse($url)
         return false;
     }
     $timestamp_from_memcache = getCreatedTimeStampFromMemCache();
-    if (!$timestamp_from_memcache) {
-        error_log('no timestamp from memcache, skip checking.');
-    }
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache)) {
         //error_log('old data, skip');
         return false;
@@ -202,6 +215,8 @@ function trytoparse($url)
     addToDB($clients_final, $timestamp);
     return true;
 }
+
+getServers();
 $serversArray = loadServersArray();
 if (count($serversArray) <= 0) {
     error_log("loadServersArray() fails!");
