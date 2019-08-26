@@ -1,6 +1,9 @@
 <h6><%- client.callsign %> (<%- client.realname %>)</h6>
 <table class="table table-sm table-bordered table-striped">
-
+<tr>
+<td>Server:</td>
+<td class="text-nowrap font-weight-bold"><%- client.server %></td>
+</tr>
 <% if(client.planned_depairport_id_) {%>
 <tr>
 <td class="text-nowrap">Departure: </td>
@@ -13,11 +16,7 @@
 <td class="text-nowrap font-weight-bold"><span class="badge badge-secondary"><%- client.planned_destairport %></span> <%- client.planned_destairport_city_ %>, <%- client.planned_destairport_country_ %><br><span class="text-muted">(<%- client.planned_destairport_name_ %>)</span></td>
 </tr>
 <% } %>
-<tr>
-<td>Server:</td>
-<td class="text-nowrap font-weight-bold"><%- client.server %></td>
-</tr>
-<% if(client.planned_altairport) { %>
+<% if(client.planned_altairport) {%>
 <tr>
 <td>Altairport: </td>
 <td class="text-nowrap font-weight-bold"><%- client.planned_altairport %></td>
@@ -28,6 +27,16 @@
 <td>Aircraft: </td>
 <td class="text-nowrap font-weight-bold"><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></td>
 </tr>
+<% } %>
+<% if (client.clienttype === "PILOT" && client.planned_hrsenroute && client.planned_minenroute) { %>
+<tr>
+<td class="text-nowrap">Enroute: </td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_hrsenroute %>h <%- client.planned_minenroute %>m<% if(client.planned_hrsfuel && client.planned_hrsfuel !== "0" || client.planned_minfuel && client.planned_minfuel !== "0") {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel || "0" %>h <%- client.planned_minfuel || "0" %>m)</span><% } %></td>
+</tr>
+<% } %>
+<% if(client.planned_altairport) { %>
+<% } %>
+<% if (client.clienttype === "PILOT") { %>
 <tr>
 <td>Altitude: </td>
 <td class="text-nowrap font-weight-bold"><%- client.altitude %> ft<% if(client.planned_altitude && client.planned_altitude !== "0") {%> <span class="text-muted">(<%- client.planned_altitude %> planned)</span><% } %></td>
@@ -38,7 +47,7 @@
 </tr>
 <tr>
 <td>Heading: </td>
-<td class="text-nowrap font-weight-bold"><%- client.heading %></td>
+<td class="text-nowrap font-weight-bold"><%- client.heading %>&deg</td>
 </tr>
 <tr>
 <td>QNH: </td>
@@ -57,10 +66,6 @@
 </tr>
 <% } %>
 <% if(client.planned_hrsenroute && client.planned_hrsenroute !== "0" || client.planned_minenroute && client.planned_minenroute !== "0") {%>
-<tr>
-<td class="text-nowrap">Enroute: </td>
-<td class="text-nowrap font-weight-bold"><%- client.planned_hrsenroute || "0" %>h <%- client.planned_minenroute || 0 %>m<% if(client.planned_hrsfuel && client.planned_hrsfuel !== "0" || client.planned_minfuel && client.planned_minfuel !== "0") {%> <span class="text-muted">(fuel: <%- client.planned_hrsfuel || "0" %>h <%- client.planned_minfuel || "0" %>m)</span><% } %></td>
-</tr>
 <% } %>
 <% if(client.planned_remarks){ %>
 <tr><td  colspan="2"><details><summary>Remarks</summary><div class="alert alert-light"><pre><%- client.planned_remarks %></pre></div></details></td></tr>
