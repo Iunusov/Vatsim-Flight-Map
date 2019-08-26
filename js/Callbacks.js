@@ -16,7 +16,7 @@ var Callbacks = function () {
         }
         var defaultLocation = [parseFloat(conf['map_center_lng']) || 27.3731, parseFloat(conf['map_center_lat']) || 36.0744];
         var zoom = parseFloat(conf['map_zoom']) || 2.0244;
-        var styles = ["mapbox://styles/mapbox/navigation-preview-day-v4", "mapbox://styles/mapbox/light-v10", "mapbox://styles/mapbox/navigation-preview-night-v4", "mapbox://styles/mapbox/outdoors-v11", "mapbox://styles/mapbox/satellite-v9"];
+        var styles = ["mapbox://styles/mapbox/navigation-preview-day-v4", "mapbox://styles/mapbox/light-v10", "mapbox://styles/mapbox/navigation-preview-night-v4", "mapbox://styles/mapbox/outdoors-v11", /*"mapbox://styles/mapbox/satellite-v9"*/];
         if (localStorage.getItem('map_style_idx') === null) {
             localStorage.setItem('map_style_idx', 0);
         }

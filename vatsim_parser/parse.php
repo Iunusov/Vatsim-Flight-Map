@@ -211,6 +211,11 @@ function trytoparse($url)
             $clients_final[$k]["planned_destairport_lat"] = $dest[6];
             $clients_final[$k]["planned_destairport_lon"] = $dest[7];
         }
+		$clients_final[$k]["planned_depairport_name_"] = $dep[1];
+		$clients_final[$k]["planned_destairport_name_"] = $dest[1];
+		
+		$clients_final[$k]["planned_depairport_country_"] = $dep[3];
+		$clients_final[$k]["planned_destairport_country_"] = $dest[3];
     }
     addToDB($clients_final, $timestamp);
     return true;

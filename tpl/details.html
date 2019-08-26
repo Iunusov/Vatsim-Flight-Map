@@ -1,5 +1,20 @@
-<h6><a href="http://vataware.com/pilot/<%- client.cid %>"><%- client.callsign %> (<%- client.realname %>)</a></h6>
-<table class="table table-sm table-bordered table-dark table-striped">
+<h6><%- client.callsign %> (<%- client.realname %>)</h6>
+<table class="table table-sm table-bordered table-striped">
+
+<% if(client.planned_depairport_name_) {%>
+<tr>
+<td class="text-nowrap">Departure: </td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_depairport_name_ %><br><span class="text-muted">(<%- client.planned_depairport_country_ %>)</span></td>
+</tr>
+<% } %>
+<% if(client.planned_destairport_name_) {%>
+<tr>
+<td class="text-nowrap">Arrival: </td>
+<td class="text-nowrap font-weight-bold"><%- client.planned_destairport_name_ %><br><span class="text-muted">(<%- client.planned_destairport_country_ %>)</span></td>
+</tr>
+<% } %>
+
+
 <tr>
 <td>Server:</td>
 <td class="text-nowrap font-weight-bold"><%- client.server %></td>
@@ -50,10 +65,10 @@
 </tr>
 <% } %>
 <% if(client.planned_remarks){ %>
-<tr><td  colspan="2"><details><summary>Remarks</summary><div class="alert alert-info"><pre><%- client.planned_remarks %></pre></div></details></td></tr>
+<tr><td  colspan="2"><details><summary>Remarks</summary><div class="alert alert-light"><pre><%- client.planned_remarks %></pre></div></details></td></tr>
 <% } %>
 <% if(client.planned_route){ %>
-<tr><td  colspan="2"><details><summary>Route</summary><div class="alert alert-info"><pre><%- client.planned_route %></pre></div></details></td></tr>
+<tr><td  colspan="2"><details><summary>Route</summary><div class="alert alert-light"><pre><%- client.planned_route %></pre></div></details></td></tr>
 <% } %>
 <% } %>
 <% if (client.clienttype === "ATC") { %>
