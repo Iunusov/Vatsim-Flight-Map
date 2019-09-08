@@ -8,7 +8,7 @@
 <body>
 <pre>
 <?php
-include ("vatsim_parser/config.php");
+include ("./config.php");
 
 echo "<h1>1) PHP-Memcache: </h1>";
 if(class_exists("Memcache")){
