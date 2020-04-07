@@ -46,13 +46,21 @@ function parseCreatedTimeStamp($str)
         error_log('parseCreatedTimeStamp(): str is not string!');
         return false;
     }
-    $res = preg_match('/; Created at (\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})/', $str, $created);
-    if (!$res || !is_array($created) || count($created) != 7) {
+	
+    $res = preg_match('/UPDATE = (\d{14})/', $str, $created);
+	
+    if (!$res || !is_array($created) || count($created) != 2) {
         error_log('preg_match() failed!');
         return false;
     }
+	$Y = substr($created[1],0,4);
+	$m = substr($created[1],4,2);
+	$d = substr($created[1],6,2);
+	$h = substr($created[1],8,2);
+	$i = substr($created[1],10,2);
+	$s = substr($created[1],12,2);
     try {
-        $obj = DateTime::createFromFormat("d/m/Y H:i:s", "{$created[1]}/{$created[2]}/{$created[3]} {$created[4]}:{$created[5]}:{$created[6]}", new DateTimeZone('UTC'));
+        $obj = DateTime::createFromFormat("d/m/Y H:i:s", "{$d}/{$m}/{$Y} {$h}:{$i}:{$s}", new DateTimeZone('UTC'));
         if (!$obj) {
             error_log('createFromFormat() failed!');
             return false;
@@ -143,9 +151,6 @@ function trytoparse($url)
         error_log("file_get_contents($url) fails");
         return false;
     }
-    if (!strpos($data, ";   END")) {
-        return false;
-    }
     preg_match("/!CLIENTS:(.*?)" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . "/s", $data, $clients_container);
     if (!isset($clients_container[1])) {
         error_log("cannot parse data");
@@ -168,7 +173,7 @@ function trytoparse($url)
         return false;
     }
     $clients = $clients[1];
-    preg_match("/; !CLIENTS section -(.*?):" . EOL_VATSIM_ . ";/", $data, $clients_tpl);
+    preg_match("/; !CLIENTS section -(.*?):" . EOL_VATSIM_ . "/", $data, $clients_tpl);
     if (!isset($clients_tpl[1])) {
         error_log("cannot parse clients_tpl ($url)");
         return false;
@@ -227,6 +232,7 @@ function trytoparse($url)
 
 getServers();
 $serversArray = loadServersArray();
+$serversArray[] = "http://eu.data.vatsim.net/vatsim-data.txt";
 if (count($serversArray) <= 0) {
     error_log("loadServersArray() fails!");
     die();
