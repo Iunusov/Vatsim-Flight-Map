@@ -6,6 +6,12 @@
 <td class="text-nowrap font-weight-bold"><%- client.server %></td>
 </tr>
 <% } %>
+<% if (client.clienttype === "ATC" && client.atc_airport_city_ && client.atc_airport_icao_) { %>
+<tr>
+<td class="text-nowrap">Airport: </td>
+<td class="text-nowrap font-weight-bold"><span class="badge badge-secondary"><%- client.atc_airport_icao_ %></span> <%- client.atc_airport_city_ %></td>
+</tr>
+<% } %>
 <% if (client.planned_depairport) { %>
 <tr>
 <td class="text-nowrap">Departure: </td>
