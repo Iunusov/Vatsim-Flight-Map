@@ -3,6 +3,7 @@ var _ = require('underscore');
 var Utils = require("./Utils.js");
 var PolyLine = require("./PolyLine.js");
 var App = function (conf, map_) {
+    var document_title = document.title;
     var utils = new Utils();
     var polyLine = new PolyLine();
     var that = this;
@@ -113,6 +114,9 @@ var App = function (conf, map_) {
                         markersArray.push(marker);
                     }
                 });
+                if (result["online"]) {
+                    document.title = document_title + " (" + result.online.toString() + " online)";
+                }
                 that.onReceiveClientsArray(that.callSignsArray);
                 dfd.resolve();
             },

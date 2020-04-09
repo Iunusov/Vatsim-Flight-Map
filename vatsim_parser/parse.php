@@ -45,6 +45,15 @@ function addKeyValueToMemcache(&$m, $key, $value, $flags = 0, $expiration = 0)
     }
     return true;
 }
+function parseUniqueUsers($str)
+{
+    $res = preg_match('/UNIQUE USERS = (\d+)/', $str, $users);
+    if ($res && is_array($users) && count($users) == 2 && is_int($users[1]))
+    {
+        return $users[1];
+    }
+    return false;
+}
 function parseCreatedTimeStamp($str)
 {
     if (!is_string($str))
@@ -117,7 +126,7 @@ function loadServersArray()
 {
     return json_decode(file_get_contents("./vatsim_servers.json") , true);
 }
-function addToDB($arr, $timestamp)
+function addToDB($arr, $timestamp, $users_online)
 {
     $m = new Memcache;
     $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
@@ -145,6 +154,7 @@ function addToDB($arr, $timestamp)
     }
     $result = array(
         "timestamp" => $timestamp,
+        "online" => $users_online,
         "data" => $clients
     );
     $json = json_encode($result);
@@ -189,6 +199,7 @@ function trytoparse($url)
     {
         error_log('old data, skip');
         return false;
+
     }
     preg_match_all("/(.*?):" . EOL_VATSIM_ . "/", $clients_container[1], $clients);
     if (!isset($clients[1]))
@@ -267,7 +278,7 @@ function trytoparse($url)
             $clients_final[$k]["atc_airport_icao_"] = $atc_airport[5];
         }
     }
-    addToDB($clients_final, $timestamp);
+    addToDB($clients_final, $timestamp, parseUniqueUsers($data));
     return true;
 }
 
