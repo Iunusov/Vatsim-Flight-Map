@@ -48,7 +48,7 @@ function addKeyValueToMemcache(&$m, $key, $value, $flags = 0, $expiration = 0)
 function parseUniqueUsers($str)
 {
     $res = preg_match('/UNIQUE USERS = (\d+)/', $str, $users);
-    if ($res && is_array($users) && count($users) == 2 && is_int($users[1]))
+    if ($res && is_array($users) && count($users) == 2 && filter_var($users[1], FILTER_VALIDATE_INT))
     {
         return $users[1];
     }
