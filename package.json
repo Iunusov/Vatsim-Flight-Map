@@ -1,9 +1,9 @@
 {
   "name": "vatmap",
-  "description": "Vatsim aircrafts and ATC on Mapbox.",
+  "description": "Vatsim aircrafts and ATC on maps.",
   "homepage": "https://github.com/Iunusov/Vatsim-Flight-Map",
-  "author": "Artur Iunusov <iunusov.artur@gmail.com>",
-  "version": "0.0.1",
+  "author": "Artur Iunusov <aaiunusov@gmail.com>",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Iunusov/Vatsim-Flight-Map"
@@ -17,7 +17,7 @@
     "mapbox",
     "map"
   ],
-  "private": true,
+  "private": false,
   "license": "MIT",
   "devDependencies": {
     "bootstrap": "^4.4.1",
