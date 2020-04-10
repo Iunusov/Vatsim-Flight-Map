@@ -38,7 +38,7 @@ var App = function (conf, map_) {
             data: {
                 "cid": cid,
                 "callsign": callsign,
-                "ts": timeStamp
+                //"ts": timeStamp
             },
             contentType: "application/json",
             dataType: "json",
@@ -60,7 +60,6 @@ var App = function (conf, map_) {
             dataType: "json",
             success: function (result, textStatus, request) {
                 var ts = result.timestamp;
-                console.log(ts);
                 if (ts && ts === timeStamp) {
                     dfd.resolve();
                     return;
@@ -73,6 +72,7 @@ var App = function (conf, map_) {
                 markersArray = [];
                 that.callSignsArray = [];
                 var data = result["data"];
+				console.log(timeStamp);
                 $.each(data, function (index, client) {
                     var cid = parseInt(client[0]);
                     if (isNaN(cid)) {
@@ -136,7 +136,7 @@ var App = function (conf, map_) {
                 clearTimeout(pTimeout);
                 pTimeout = false;
             }
-            pTimeout = setTimeout(that.startPolling, 60 * 1000);
+            pTimeout = setTimeout(that.startPolling, 30 * 1000);
         });
     }
     this.searchForCallsign = function (callsign) {
