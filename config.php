@@ -5,5 +5,5 @@ define ("MEMCACHE_PREFIX_VATSIM", "vatsim");
 define ("MEMCACHE_PREFIX_CLIENTS_DATA", "clients_data");
 define ("MEMCACHE_PREFIX_META", "meta");
 define ("MEMCACHE_PREFIX_JSON", "json");
-define ("CACHE_LIFETIME_SECONDS", 30);
+define ("CACHE_LIFETIME_SECONDS", 120);
 ?>

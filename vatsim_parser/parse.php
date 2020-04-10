@@ -277,6 +277,7 @@ function trytoparse($url)
             $clients_final[$k]["atc_airport_city_"] = $atc_airport[2];
             $clients_final[$k]["atc_airport_icao_"] = $atc_airport[5];
         }
+       $clients_final[$k]["timestamp"] = $timestamp;
     }
     addToDB($clients_final, $timestamp, parseUniqueUsers($data));
     return true;
