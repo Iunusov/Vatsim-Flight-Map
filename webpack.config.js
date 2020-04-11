@@ -5,7 +5,7 @@ var ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 var exec = require('child_process').exec;
 module.exports = {
     entry: {
-        app: ['./prod.js', './js/main.js', 'jquery', 'underscore', 'jquery-ui/ui/widgets/autocomplete', 'bootstrap/dist/css/bootstrap.css', 'jquery-ui/themes/base/core.css', 'jquery-ui/themes/base/menu.css', 'jquery-ui/themes/base/theme.css', 'jquery-ui/themes/base/autocomplete.css'],
+        app: ['./prod.js', './js/main.js', 'jquery', 'underscore', 'jquery-ui/ui/widgets/autocomplete', 'bootstrap/dist/css/bootstrap.css', 'jquery-ui/themes/base/core.css', 'jquery-ui/themes/base/menu.css', 'jquery-ui/themes/base/theme.css', 'jquery-ui/themes/base/autocomplete.css', 'details-polyfill'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),

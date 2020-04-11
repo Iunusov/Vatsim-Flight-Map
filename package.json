@@ -21,11 +21,11 @@
   "license": "MIT",
   "devDependencies": {
     "bootstrap": "^4.4.1",
-    "css-loader": "^3.5.1",
+    "css-loader": "^3.5.2",
     "file-loader": "^6.0.0",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.2.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
     "popper.js": "^1.16.1",
     "raw-loader": "^4.0.0",
@@ -34,6 +34,7 @@
     "underscore": "^1.10.2",
     "url-loader": "^4.1.0",
     "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.11",
+    "details-polyfill": "^1.1.0"
   }
 }
