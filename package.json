@@ -3,7 +3,7 @@
   "description": "Vatsim aircrafts and ATC on maps.",
   "homepage": "https://github.com/Iunusov/Vatsim-Flight-Map",
   "author": "Artur Iunusov <aaiunusov@gmail.com>",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/Iunusov/Vatsim-Flight-Map"
