@@ -17,7 +17,12 @@ after that, add your api key to the [prod.js](https://github.com/Iunusov/Vatsim-
 
 Install required dependencies:
 
-    $ sudo apt install nodejs npm webpack
+    $ cd ~
+    $ curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
+    $ sudo bash nodesource_setup.sh
+    $ sudo apt install nodejs
+    $ sudo npm install webpack-cli -g
+    $ sudo npm install webpack -g
     $ sudo apt install memcached php-cli php-xml php-memcache
 
 Build web app:
