@@ -7,6 +7,8 @@ include ("../config.php");
 include ("Airports.php");
 define("EOL_VATSIM_", "\n");
 
+$airports = new Airports();
+
 function getServers()
 {
     $filename = "./vatsim_servers.json";
@@ -236,7 +238,7 @@ function trytoparse($url)
         }
     }
     //get planned_depairport_lat, planned_depairport_lon, planned_destairport_lat, planned_destairport_lon values from the database
-    $airports = new Airports();
+    global $airports;
     foreach ($clients_final as $k => $v)
     {
         if (!is_array($v))
