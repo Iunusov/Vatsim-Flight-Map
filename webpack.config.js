@@ -26,10 +26,15 @@ module.exports = {
     module: {
         rules: [{
                 test: /\.css$/,
-                loaders: ["style-loader", "css-loader"]
+                use: [{
+                        loader: "style-loader"
+                    }, {
+                        loader: "css-loader"
+                    }
+                ]
             }, {
                 test: /\.(png)$/i,
-                loader: 'url-loader?limit=100000'
+                loader: 'url-loader'
             }, {
                 test: /\.html$/,
                 use: [{
