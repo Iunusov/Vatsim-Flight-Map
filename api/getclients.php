@@ -1,8 +1,7 @@
 <?php
-require ('utils.php');
+require ('db.php');
+require ('http.php');
 
-$timestamp = 0;
-$json = getClientsFromMemcache($timestamp);
-writeHttpContent($timestamp, $json);
+http\write(db\getAll());
 
 ?>

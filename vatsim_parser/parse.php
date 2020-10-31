@@ -4,6 +4,8 @@ php_sapi_name() == "cli" or die("<br><strong>This script is not intended to be r
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include ("../config.php");
+include ("../api/memcache.php");
+include ("../api/db.php");
 include ("Airports.php");
 define("EOL_VATSIM_", "\n");
 
@@ -39,16 +41,7 @@ function getLogonTime($str)
     $interval = $logonDateTime->diff(new DateTime(null, new DateTimeZone("UTC")));
     return $interval->format('%d days %h hours %i minutes');
 }
-function addKeyValueToMemcache(&$m, $key, $value)
-{
-    $flags = 0;
-    $expiration = CACHE_LIFETIME_SECONDS * 3;
-    if ($m->replace($key, $value, $flags, $expiration) == false)
-    {
-        return $m->set($key, $value, $flags, $expiration);
-    }
-    return true;
-}
+
 function parseUniqueUsers($str)
 {
     $res = preg_match('/UNIQUE USERS = (\d+)/', $str, $users);
@@ -95,18 +88,7 @@ function parseCreatedTimeStamp($str)
         return false;
     }
 }
-function getCreatedTimeStampFromMemCache()
-{
-    $m = new Memcache;
-    $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
-    $clients_data = $m->get(md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META));
-    $m->close();
-    if (!$clients_data)
-    {
-        return false;
-    }
-    return (int)$clients_data['created_timestamp'];
-}
+
 function toUTF8($str)
 {
     if (!((bool)preg_match('//u', $str)))
@@ -132,8 +114,6 @@ function loadServersArray()
 }
 function addToDB($arr, $timestamp, $users_online)
 {
-    $m = new Memcache;
-    $m->connect(MEMCACHE_IP, MEMCACHE_PORT);
     $clients = array();
     foreach ($arr as $v)
     {
@@ -149,7 +129,7 @@ function addToDB($arr, $timestamp, $users_online)
             $v["latitude"],
             $v["longitude"]
         );
-        addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . $v["cid"] . $v["callsign"]) , json_encode($v));
+        memcache\set($v["cid"] . $v["callsign"], json_encode($v));
         if (json_last_error() != JSON_ERROR_NONE)
         {
             error_log("json_last_error(): " . json_last_error());
@@ -166,10 +146,9 @@ function addToDB($arr, $timestamp, $users_online)
     {
         error_log("json_last_error(): " . json_last_error());
     }
-    $res = addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_JSON), $json) && addKeyValueToMemcache($m, md5(MEMCACHE_PREFIX_VATSIM . MEMCACHE_PREFIX_CLIENTS_DATA . MEMCACHE_PREFIX_META) , array(
+    $res = memcache\set(VATSIM_DATA, $json) && memcache\set(VATSIM_META, array(
         'created_timestamp' => $timestamp
     ));
-    $m->close();
     if (!$res)
     {
         error_log('failed to save data to memcache!');
@@ -198,10 +177,10 @@ function trytoparse($url)
         error_log('parseCreatedTimeStamp() fails.');
         return false;
     }
-    $timestamp_from_memcache = getCreatedTimeStampFromMemCache();
+    $timestamp_from_memcache = db\getTimestamp();
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache))
     {
-        error_log('old data, skip');
+        //error_log('old data, skip');
         return false;
 
     }
@@ -281,7 +260,7 @@ function trytoparse($url)
             $clients_final[$k]["atc_airport_city_"] = $atc_airport[2];
             $clients_final[$k]["atc_airport_icao_"] = $atc_airport[5];
         }
-       $clients_final[$k]["timestamp"] = $timestamp;
+        $clients_final[$k]["timestamp"] = $timestamp;
     }
     addToDB($clients_final, $timestamp, parseUniqueUsers($data));
     return true;
