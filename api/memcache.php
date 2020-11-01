@@ -18,7 +18,7 @@ function get($key)
     {
         connect();
     }
-    $key = strtoupper($key);
+    $key = md5(strtoupper($key));
     return $mc->get($key);
 }
 
@@ -30,7 +30,7 @@ function set($key, $value)
         connect();
     }
     $flags = 0;
-    $key = strtoupper($key);
+    $key = md5(strtoupper($key));
     if ($mc->replace($key, $value, $flags, MEMCACHE_EXPIRY_SECONDS) == false)
     {
         return $mc->set($key, $value, $flags, MEMCACHE_EXPIRY_SECONDS);
