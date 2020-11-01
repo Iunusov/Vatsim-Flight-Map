@@ -1,9 +1,9 @@
 {
   "name": "vatmap",
-  "description": "Vatsim aircrafts and ATC on maps.",
+  "description": "Vatsim/Ivao aircrafts and ATC on maps.",
   "homepage": "https://github.com/Iunusov/Vatsim-Flight-Map",
   "author": "Artur Iunusov <aaiunusov@gmail.com>",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Iunusov/Vatsim-Flight-Map"
@@ -13,6 +13,7 @@
   },
   "keywords": [
     "vatsim",
+    "ivao",
     "vatmap",
     "mapbox",
     "map"

@@ -18,6 +18,7 @@ function get($key)
     {
         connect();
     }
+    $key = strtoupper($key);
     return $mc->get($key);
 }
 
@@ -29,10 +30,10 @@ function set($key, $value)
         connect();
     }
     $flags = 0;
-    $expiration = CACHE_LIFETIME_SECONDS * 3;
-    if ($mc->replace($key, $value, $flags, $expiration) == false)
+    $key = strtoupper($key);
+    if ($mc->replace($key, $value, $flags, MEMCACHE_EXPIRY_SECONDS) == false)
     {
-        return $mc->set($key , $value, $flags, $expiration);
+        return $mc->set($key, $value, $flags, MEMCACHE_EXPIRY_SECONDS);
     }
     return true;
 }

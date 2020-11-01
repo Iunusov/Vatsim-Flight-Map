@@ -3,31 +3,39 @@
 php_sapi_name() == "cli" or die("<br><strong>This script is not intended to be runned from web.</strong>" . PHP_EOL);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
 include ("../config.php");
 include ("../api/memcache.php");
 include ("../api/db.php");
 include ("Airports.php");
-define("EOL_VATSIM_", "\n");
+
+define("EOL__", "\n");
+define("STATUS_URL_TYPE", count($argv) >= 2 && $argv[1] == "ivao" ? "IVAO" : "VATSIM");
+define("SERVERS_LIST", "./" . strtolower(STATUS_URL_TYPE) . "_servers.json");
 
 $airports = new Airports();
 
+function isIvao()
+{
+    return strcasecmp(STATUS_URL_TYPE, "ivao") == 0;
+}
+
 function getServers()
 {
-    $filename = "./vatsim_servers.json";
-    if (file_exists($filename) && (time() - filemtime($filename)) < 12 * 60 * 60)
+    $status_url = isIvao() ? STATUS_URL_IVAO : STATUS_URL_VATSIM;
+    if (file_exists(SERVERS_LIST) && (time() - filemtime(SERVERS_LIST)) < 12 * 60 * 60)
     {
         return;
     }
-    $statusURL = "http://status.vatsim.net/";
-    $content = str_replace("\r\n", "\n", file_get_contents($statusURL));
+    $content = str_replace("\r\n", "\n", file_get_contents($status_url));
     $servers = false;
-    preg_match_all("/url0=(.*)/", $content, $servers);
+    preg_match_all("/" . EOL__ . "url0=(.*)/", $content, $servers);
     if (count(json_decode(json_encode($servers[1]) , true)) <= 0)
     {
-        error_log("can't get servers list from $statusURL");
+        error_log("can't get servers list from " . $status_url);
         die();
     }
-    file_put_contents($filename, json_encode($servers[1]) . PHP_EOL, LOCK_EX);
+    file_put_contents(SERVERS_LIST, json_encode($servers[1]) . PHP_EOL, LOCK_EX);
 }
 
 function getLogonTime($str)
@@ -42,9 +50,9 @@ function getLogonTime($str)
     return $interval->format('%d days %h hours %i minutes');
 }
 
-function parseUniqueUsers($str)
+function getUsersOnline($str)
 {
-    $res = preg_match('/UNIQUE USERS = (\d+)/', $str, $users);
+    $res = preg_match('/CONNECTED CLIENTS = (\d+)/', $str, $users);
     if ($res && is_array($users) && count($users) == 2 && filter_var($users[1], FILTER_VALIDATE_INT))
     {
         return $users[1];
@@ -110,9 +118,9 @@ function fixArrayEncoding(&$arr)
 }
 function loadServersArray()
 {
-    return json_decode(file_get_contents("./vatsim_servers.json") , true);
+    return json_decode(file_get_contents(SERVERS_LIST) , true);
 }
-function addToDB($arr, $timestamp, $users_online)
+function addToDB($type, $arr, $timestamp, $users_online)
 {
     $clients = array();
     foreach ($arr as $v)
@@ -129,7 +137,7 @@ function addToDB($arr, $timestamp, $users_online)
             $v["latitude"],
             $v["longitude"]
         );
-        memcache\set($v["cid"] . $v["callsign"], json_encode($v));
+        memcache\set($type . $v["cid"] . $v["callsign"], json_encode($v));
         if (json_last_error() != JSON_ERROR_NONE)
         {
             error_log("json_last_error(): " . json_last_error());
@@ -138,16 +146,17 @@ function addToDB($arr, $timestamp, $users_online)
     }
     $result = array(
         "timestamp" => $timestamp,
+        "network" => STATUS_URL_TYPE,
         "online" => $users_online,
-        "data" => $clients
+        "data" => $clients,
     );
     $json = json_encode($result);
     if (json_last_error() != JSON_ERROR_NONE)
     {
         error_log("json_last_error(): " . json_last_error());
     }
-    $res = memcache\set(VATSIM_DATA, $json) && memcache\set(VATSIM_META, array(
-        'created_timestamp' => $timestamp
+    $res = memcache\set($type . CLIENTS_DATA, $json) && memcache\set($type . CLIENTS_META, array(
+        'created_timestamp' => $timestamp,
     ));
     if (!$res)
     {
@@ -156,15 +165,21 @@ function addToDB($arr, $timestamp, $users_online)
 }
 function trytoparse($url)
 {
+    $ivao_tpl = isIvao() ? "; !CLIENTS section -         callsign:cid:realname:clienttype:frequency:latitude:longitude:altitude:groundspeed:planned_aircraft:planned_tascruise:planned_depairport:planned_altitude:planned_destairport:server:protrevision:rating:transponder:facilitytype:visualrange:planned_revision:planned_flighttype:planned_deptime:planned_actdeptime:planned_hrsenroute:planned_minenroute:planned_hrsfuel:planned_minfuel:planned_altairport:planned_remarks:planned_route:unused:unused2:unused3:unused4:atis_message:time_last_atis_received:time_logon:software_name:software_version:administrative_version:atc_pilot_version:planned_altairport2:type_of_flight:persons:heading:on_ground:simulator:\n" : "";
+
     $clients_container = Array();
     $data = file_get_contents($url);
-    $data = str_replace("\r\n", EOL_VATSIM_, $data);
+    $data = $ivao_tpl . str_replace("\r\n", EOL__, $data);
+
     if (!$data)
     {
         error_log("file_get_contents($url) fails");
         return false;
     }
-    preg_match("/!CLIENTS:(.*?)" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . ";" . EOL_VATSIM_ . "/s", $data, $clients_container);
+    $pattern = isIvao() ? "/!CLIENTS\n(.*?)" . EOL__ . "!AIRPORTS" . "/s" : "/!CLIENTS:(.*?)" . EOL__ . ";" . EOL__ . ";" . EOL__ . "/s";
+    preg_match($pattern, $data, $clients_container);
+    preg_match($pattern, $data, $clients_container);
+
     if (!isset($clients_container[1]))
     {
         error_log("cannot parse data");
@@ -177,21 +192,24 @@ function trytoparse($url)
         error_log('parseCreatedTimeStamp() fails.');
         return false;
     }
-    $timestamp_from_memcache = db\getTimestamp();
+    $timestamp_from_memcache = db\getTimestamp(STATUS_URL_TYPE);
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache))
     {
         //error_log('old data, skip');
         return false;
 
     }
-    preg_match_all("/(.*?):" . EOL_VATSIM_ . "/", $clients_container[1], $clients);
+
+    preg_match_all("/(.*?):" . EOL__ . "/", $clients_container[1], $clients);
     if (!isset($clients[1]))
     {
         error_log("cannot parse !CLIENTS container ($url)");
         return false;
     }
     $clients = $clients[1];
-    preg_match("/; !CLIENTS section -(.*?):" . EOL_VATSIM_ . "/", $data, $clients_tpl);
+
+    preg_match("/; !CLIENTS section -(.*?):" . EOL__ . "/", $data, $clients_tpl);
+
     if (!isset($clients_tpl[1]))
     {
         error_log("cannot parse clients_tpl ($url)");
@@ -204,8 +222,9 @@ function trytoparse($url)
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
         $combined = @array_combine($tpl_array, $cl_array);
-        if (!$combined)
+        if (!$combined || !is_array($combined) || empty($combined))
         {
+            error_log("array_combine error");
             continue;
         }
         if ($combined && is_array($combined))
@@ -216,6 +235,7 @@ function trytoparse($url)
             $clients_final[] = $combined;
         }
     }
+
     //get planned_depairport_lat, planned_depairport_lon, planned_destairport_lat, planned_destairport_lon values from the database
     global $airports;
     foreach ($clients_final as $k => $v)
@@ -261,14 +281,22 @@ function trytoparse($url)
             $clients_final[$k]["atc_airport_icao_"] = $atc_airport[5];
         }
         $clients_final[$k]["timestamp"] = $timestamp;
+        $clients_final[$k]["network"] = STATUS_URL_TYPE;
     }
-    addToDB($clients_final, $timestamp, parseUniqueUsers($data));
+    addToDB(STATUS_URL_TYPE, $clients_final, $timestamp, getUsersOnline($data));
     return true;
 }
 
 getServers();
 $serversArray = loadServersArray();
-$serversArray[] = "http://eu.data.vatsim.net/vatsim-data.txt";
+if (isIvao())
+{
+    $serversArray[] = "https://api.ivao.aero/getdata/whazzup/whazzup.txt";
+}
+else
+{
+    $serversArray[] = "http://eu.data.vatsim.net/vatsim-data.txt";
+}
 if (count($serversArray) <= 0)
 {
     error_log("loadServersArray() fails!");

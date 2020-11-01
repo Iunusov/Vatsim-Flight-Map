@@ -3,18 +3,18 @@ namespace db;
 require_once ('../config.php');
 require_once ('memcache.php');
 
-function getDetails($cid, $callsign)
+function getDetails($type, $cid, $callsign)
 {
-    return \memcache\get($cid . $callsign);
+    return \memcache\get($type . $cid . $callsign);
 }
 
-function getAll()
+function getAll($type)
 {
-    return \memcache\get(VATSIM_DATA);
+    return \memcache\get($type . CLIENTS_DATA);
 }
 
-function getTimestamp()
+function getTimestamp($type)
 {
-    return (int)\memcache\get(VATSIM_META) ['created_timestamp'];
+    return (int)\memcache\get($type . CLIENTS_META) ['created_timestamp'];
 }
 ?>

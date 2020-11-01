@@ -9,11 +9,12 @@ var App = function (conf, map_) {
     var that = this;
     var map = map_;
     var pTimeout = false;
-    var timeStamp = null;
+    var timestamp = null;
     var markersArray = [];
+    var network_ = conf.network;
     var infowindow = new mapboxgl.Popup({
-            maxWidth: "500px"
-        });
+        maxWidth: "500px"
+    });
     this.getMap = function () {
         return map;
     }
@@ -38,7 +39,8 @@ var App = function (conf, map_) {
             data: {
                 "cid": cid,
                 "callsign": callsign,
-                //"ts": timeStamp
+                "t": network_,
+                "ts": timestamp
             },
             contentType: "application/json",
             dataType: "json",
@@ -56,15 +58,18 @@ var App = function (conf, map_) {
             timeout: 5000,
             type: "GET",
             url: "api/getclients.php",
+            data: {
+                "t": network_
+            },
             contentType: "application/json",
             dataType: "json",
             success: function (result, textStatus, request) {
                 var ts = result.timestamp;
-                if (ts && ts === timeStamp) {
+                if (ts && ts === timestamp) {
                     dfd.resolve();
                     return;
                 }
-                timeStamp = ts;
+                timestamp = ts;
                 for (var i = 0; i < markersArray.length; i++) {
                     markersArray[i].remove();
                     delete markersArray[i];
@@ -72,7 +77,7 @@ var App = function (conf, map_) {
                 markersArray = [];
                 that.callSignsArray = [];
                 var data = result["data"];
-				console.log(timeStamp);
+                console.log(timestamp);
                 $.each(data, function (index, client) {
                     var cid = parseInt(client[0]);
                     if (isNaN(cid)) {

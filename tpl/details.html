@@ -1,5 +1,11 @@
 <h6><%- client.callsign %> <% if (client.realname) { %>(<%- client.realname %>)<% } %></h6>
 <table class="table table-sm table-bordered table-striped" style="font-size: 120%">
+<% if (client.network) { %>
+<tr>
+<td>Network:</td>
+<td class="text-nowrap font-weight-bold"><%- client.network %></td>
+</tr>
+<% } %>
 <% if (client.server) { %>
 <tr>
 <td>Server:</td>
@@ -15,13 +21,13 @@
 <% if (client.planned_depairport) { %>
 <tr>
 <td class="text-nowrap">Departure: </td>
-<td class="text-nowrap font-weight-bold"><span class="badge badge-secondary"><%- client.planned_depairport %></span> <% if (client.planned_depairport_city_) { %><%- client.planned_depairport_city_ %>, <%- client.planned_depairport_country_ %><br><span class="text-muted">(<%- client.planned_depairport_name_ %>)</span><% } %></td>
+<td class="font-weight-bold"><span class="badge badge-secondary"><%- client.planned_depairport %></span> <% if (client.planned_depairport_city_) { %><%- client.planned_depairport_city_ %>, <%- client.planned_depairport_country_ %><br><span class="text-muted">(<%- client.planned_depairport_name_ %>)</span><% } %></td>
 </tr>
 <% } %>
 <% if (client.planned_destairport) { %>
 <tr>
 <td class="text-nowrap">Arrival: </td>
-<td class="text-nowrap font-weight-bold"><span class="badge badge-secondary"><%- client.planned_destairport %></span> <% if (client.planned_destairport_city_) { %><%- client.planned_destairport_city_ %>, <%- client.planned_destairport_country_ %><br><span class="text-muted">(<%- client.planned_destairport_name_ %>)</span><% } %></td>
+<td class="font-weight-bold"><span class="badge badge-secondary"><%- client.planned_destairport %></span> <% if (client.planned_destairport_city_) { %><%- client.planned_destairport_city_ %>, <%- client.planned_destairport_country_ %><br><span class="text-muted">(<%- client.planned_destairport_name_ %>)</span><% } %></td>
 </tr>
 <% } %>
 <% if(client.planned_altairport) {%>
@@ -33,7 +39,7 @@
 <% if (client.clienttype === "PILOT") { %>
 <tr>
 <td>Aircraft: </td>
-<td class="text-nowrap font-weight-bold"><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></td>
+<td class="font-weight-bold"><% if(client.planned_aircraft) {%><%- client.planned_aircraft %>, <% } %>Squawk: <%- client.transponder %></td>
 </tr>
 <% } %>
 <% if (client.clienttype === "PILOT" && client.planned_hrsenroute && client.planned_minenroute) { %>
@@ -57,10 +63,12 @@
 <td>Heading: </td>
 <td class="text-nowrap font-weight-bold"><%- client.heading %>&deg</td>
 </tr>
+<% if (client.QNH_iHg) { %>
 <tr>
 <td>QNH: </td>
 <td class="text-nowrap font-weight-bold"><%- client.QNH_iHg %> iHg <span class="text-muted">(<%- client.QNH_Mb %> Mb)</span></td>
 </tr>
+<% } %>
 <% if(client.planned_deptime && client.planned_deptime !== "0"){ %>
 <tr>
 <td>Deptime: </td>

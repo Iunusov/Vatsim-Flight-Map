@@ -1,81 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <title>VATSIM Map</title>
-    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" /><![endif]-->
-    <!--[if lt IE 9]>
-  <script src="lib/html5shiv.js"></script>
-<![endif]-->
-    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="language" content="EN">
-    <meta name="keywords" content="VATSIM,flight,map,online,vatmap">
-    <meta name="description" content="VATSIM Online Map. Updated every 2 min. Track your virtual flight online!">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" sizes="192x192" href="icon.png">
-    <script src='//api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
-    <link href='//api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-        
-        #map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-        }
-        
-        .marker {
-            display: block;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            padding: 0;
-            height: 30px;
-            width: 30px;
-            background-repeat: no-repeat;
-        }
-        
-        .popups {
-            display: table;
-            width: auto;
-            margin: 5px;
-            padding: 2px;
-        }
-        
-        .ui-autocomplete {
-            height: 400px;
-            overflow-y: scroll;
-            overflow-x: hidden;
-        }
-        
-        .hidden {
-            display: none
-        }
-    </style>
-    <base target="_blank" />
-</head>
-
-<body>
-    <div id="searchrow" class="container hidden">
-        <div class="row justify-content-end" style="padding:5px">
+   <head>
+      <meta charset="utf-8">
+      <title>VATSIM / IVAO Map</title>
+      <!--[if IE]>
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+      <![endif]-->
+      <!--[if lt IE 9]>
+      <script src="lib/html5shiv.js"></script>
+      <![endif]-->
+      <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />
+      <meta name="mobile-web-app-capable" content="yes">
+      <meta name="language" content="EN">
+      <meta name="keywords" content="VATSIM,IVAO,flight,map,online,vatmap">
+      <meta name="description" content="VATSIM/IVAO Online Map. Updated every 2 min. Track your virtual flight online!">
+      <link rel="manifest" href="manifest.json">
+      <link rel="icon" sizes="192x192" href="icon.png">
+      <script src='//api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
+      <link href='//api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
+      <style>
+         body {
+         margin: 0;
+         padding: 0;
+         }
+         #map {
+         position: absolute;
+         top: 0;
+         bottom: 0;
+         width: 100%;
+         }
+         .marker {
+         display: block;
+         border: none;
+         border-radius: 50%;
+         cursor: pointer;
+         padding: 0;
+         height: 30px;
+         width: 30px;
+         background-repeat: no-repeat;
+         }
+         .popups {
+         display: table;
+         width: auto;
+         margin: 5px;
+         padding: 2px;
+         }
+         .ui-autocomplete {
+         height: 400px;
+         overflow-y: scroll;
+         overflow-x: hidden;
+         }
+         .hidden {
+         display: none
+         }
+      </style>
+      <base target="_blank" />
+   </head>
+   <body>
+      <div id="searchrow" class="container hidden">
+         <div class="row justify-content-end" style="padding:5px">
             <div class="col-8 col-md-5 col-lg-4">
-                <div class="input-group" style="z-index:3">
-                    <input id="inputCallsign" type="text" class="form-control" placeholder="callsign">
-                    <span class="input-group-btn">
-        <button id="buttonCallsign" class="btn btn-primary" type="button">Search</button>
-      </span>
-                </div>
+               <div class="input-group" style="z-index:3">
+                  <input id="inputCallsign" type="text" class="form-control" placeholder="callsign">
+                  <span class="input-group-btn">
+                  <button id="buttonCallsign" class="btn btn-primary" type="button">Search</button>
+                  </span>
+               </div>
             </div>
-        </div>
-    </div>
-
-    <div id='map'></div>
-</body>
-
+         </div>
+         <div class="row justify-content-end" style="padding:5px">
+            <div class="col-8 col-md-5 col-lg-4">
+               <div class="input-group" style="z-index:3">
+                  <div class="form-check form-check-inline">
+                     <input class="form-check-input" type="radio" name="vatsimIvao" id="vatsimRadio" value="vatsim">
+                     <label class="form-check-label" for="vatsimRadio"><h5>VATSIM</h5></label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                     <input class="form-check-input" type="radio" name="vatsimIvao" id="ivaoRadio" value="ivao">
+                     <label class="form-check-label" for="ivaoRadio"><h5>IVAO</h5></label>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div id='map'></div>
+   </body>
 </html>
