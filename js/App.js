@@ -141,7 +141,7 @@ var App = function (conf, map_) {
                 clearTimeout(pTimeout);
                 pTimeout = false;
             }
-            pTimeout = setTimeout(that.startPolling, 30 * 1000);
+            pTimeout = setTimeout(that.startPolling, 2 * 60 * 1000);
         });
     }
     this.searchForCallsign = function (callsign) {

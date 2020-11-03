@@ -33,7 +33,8 @@ Build web app:
 Parser scripts:
 
     $ cd vatsim_parser
-    $ ./parse.php          #you might set up this cron job to run once a minute
+    $ ./parse.php vatsim   #add cron job to parse every 2 minutes
+    $ ./parse.php ivao     #add cron job to parse every 5 minutes
 
 ## License
 
