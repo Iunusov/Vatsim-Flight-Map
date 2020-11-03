@@ -43,7 +43,6 @@ var Utils = function () {
     this.objectToHTML = function (src) {
         var client = $.extend({}, src);
         client["altitude"] = that.commaSeparateNumber(client["altitude"]);
-        client["time_logon"] = client["time_online"];
         if (client.clienttype === "PILOT") {
             client["planned_deptime"] = that.formatDepTime(client["planned_deptime"]);
             client["planned_actdeptime"] = that.formatDepTime(client["planned_actdeptime"]);

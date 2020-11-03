@@ -6,6 +6,12 @@
 <td class="text-nowrap font-weight-bold"><%- client.network %></td>
 </tr>
 <% } %>
+<% if (client.time_logon) { %>
+<tr>
+<td>Online:</td>
+<td class="text-nowrap font-weight-bold"><%- client.time_logon %></td>
+</tr>
+<% } %>
 <% if (client.server) { %>
 <tr>
 <td>Server:</td>

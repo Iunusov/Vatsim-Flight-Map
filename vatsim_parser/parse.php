@@ -291,6 +291,7 @@ function trytoparse($url)
         }
         $clients_final[$k]["timestamp"] = $timestamp;
         $clients_final[$k]["network"] = STATUS_URL_TYPE;
+        $clients_final[$k]["time_logon"] = getLogonTime($clients_final[$k]["time_logon"]);
     }
     addToDB(STATUS_URL_TYPE, $clients_final, $timestamp, getUsersOnline($data));
     return true;
