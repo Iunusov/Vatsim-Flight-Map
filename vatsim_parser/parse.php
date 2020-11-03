@@ -197,7 +197,7 @@ function trytoparse($url)
     {
         //error_log('old data, skip');
         return false;
-
+        
     }
 
     preg_match_all("/(.*?):" . EOL__ . "/", $clients_container[1], $clients);
@@ -217,11 +217,20 @@ function trytoparse($url)
     }
     $clients_final = array();
     $tpl_array = explode(":", trim($clients_tpl[1]));
+
+    $tpl_array_without_atis = $tpl_array;
+    unset($tpl_array_without_atis[36]);
+    unset($tpl_array_without_atis[35]);
+
     foreach ($clients as $item)
     {
         $cl_array = explode(":", trim($item));
         fixArrayEncoding($cl_array);
         $combined = @array_combine($tpl_array, $cl_array);
+        if (!$combined)
+        {
+            $combined = @array_combine($tpl_array_without_atis, $cl_array);
+        }
         if (!$combined || !is_array($combined) || empty($combined))
         {
             error_log("array_combine error");
@@ -231,7 +240,7 @@ function trytoparse($url)
         {
             $combined["planned_remarks"] = wordwrap($combined["planned_remarks"], 40);
             $combined["planned_route"] = wordwrap($combined["planned_route"], 40);
-            $combined["atis_message"] = wordwrap($combined["atis_message"], 40);
+            if (isset($combined["atis_message"])) $combined["atis_message"] = wordwrap($combined["atis_message"], 40);
             $clients_final[] = $combined;
         }
     }
