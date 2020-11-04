@@ -9,7 +9,6 @@ include ("../api/memcache.php");
 include ("../api/db.php");
 include ("Airports.php");
 
-define("EOL__", "\n");
 define("STATUS_URL_TYPE", count($argv) >= 2 && $argv[1] == "ivao" ? "IVAO" : "VATSIM");
 define("SERVERS_LIST", "./" . strtolower(STATUS_URL_TYPE) . "_servers.json");
 
@@ -57,7 +56,7 @@ function getUsersOnline($str)
     {
         return $users[1];
     }
-    return false;
+    return 0;
 }
 function parseCreatedTimeStamp($str)
 {
@@ -137,11 +136,11 @@ function addToDB($type, $arr, $timestamp, $users_online)
             $v["latitude"],
             $v["longitude"]
         );
+
         memcache\set($type . $v["cid"] . $v["callsign"], json_encode($v));
         if (json_last_error() != JSON_ERROR_NONE)
         {
             error_log("json_last_error(): " . json_last_error());
-            print_r($v);
         }
     }
     $result = array(
@@ -165,26 +164,24 @@ function addToDB($type, $arr, $timestamp, $users_online)
 }
 function trytoparse($url)
 {
-    $ivao_tpl = isIvao() ? "; !CLIENTS section -         callsign:cid:realname:clienttype:frequency:latitude:longitude:altitude:groundspeed:planned_aircraft:planned_tascruise:planned_depairport:planned_altitude:planned_destairport:server:protrevision:rating:transponder:facilitytype:visualrange:planned_revision:planned_flighttype:planned_deptime:planned_actdeptime:planned_hrsenroute:planned_minenroute:planned_hrsfuel:planned_minfuel:planned_altairport:planned_remarks:planned_route:unused:unused2:unused3:unused4:atis_message:time_last_atis_received:time_logon:software_name:software_version:administrative_version:atc_pilot_version:planned_altairport2:type_of_flight:persons:heading:on_ground:simulator:\n" : "";
-
-    $clients_container = Array();
+    preg_match(isIvao() ? IVAO_PATTERN : VATSIM_PATTERN, isIvao() ? IVAO_HEADER : VATSIM_HEADER, $clients_tpl);
+    if (!isset($clients_tpl[1]))
+    {
+        error_log("cannot parse clients_tpl ($url)");
+        return false;
+    }
     $data = file_get_contents($url);
-    $data = $ivao_tpl . str_replace("\r\n", EOL__, $data);
-
     if (!$data)
     {
         error_log("file_get_contents($url) fails");
         return false;
     }
-    $pattern = isIvao() ? "/!CLIENTS\n(.*?)" . EOL__ . "!" . "/s" : "/!CLIENTS:(.*?)" . EOL__ . ";" . EOL__ . ";" . EOL__ . "/s";
-    preg_match($pattern, $data, $clients_container);
-
-    if (!isset($clients_container[1]))
+    if (getUsersOnline($data) == 0)
     {
-        error_log("cannot parse data");
-        return false;
+        error_log('zero users online');
+        return;
     }
-    $clients = "";
+    $data = str_replace("\r\n", EOL__, $data);
     $timestamp = parseCreatedTimeStamp($data);
     if (!$timestamp)
     {
@@ -199,99 +196,77 @@ function trytoparse($url)
 
     }
 
-    preg_match_all("/(.*?):" . EOL__ . "/", $clients_container[1], $clients);
-    if (!isset($clients[1]))
+    $count = preg_match_all(isIvao() ? IVAO_PATTERN : VATSIM_PATTERN, $data, $clients);
+
+    if (!$count || !isset($clients[1]))
     {
-        error_log("cannot parse !CLIENTS container ($url)");
+        error_log("cannot parse data (or there is no connected clients to your server)");
         return false;
     }
-    $clients = $clients[1];
 
-    preg_match("/; !CLIENTS section -(.*?):" . EOL__ . "/", $data, $clients_tpl);
+    $clients_final = Array();
 
-    if (!isset($clients_tpl[1]))
+    for ($j = 0;$j < $count;$j++)
     {
-        error_log("cannot parse clients_tpl ($url)");
-        return false;
-    }
-    $clients_final = array();
-    $tpl_array = explode(":", trim($clients_tpl[1]));
+        $one_client = Array();
+        for ($key = 1;$key < count($clients_tpl);$key++)
+        {
+            //IVAO: absent atis_message:time_last_atis_received info hack
+            if (isIvao() && ($key == 35 || $key == 36) && substr_count($clients[0][$j], ":") == 46)
+            {
+                continue;
+            }
+            $one_client[$clients_tpl[$key]] = $clients[$key][$j];
+        }
 
-    $tpl_array_without_atis = $tpl_array;
-    unset($tpl_array_without_atis[36]);
-    unset($tpl_array_without_atis[35]);
+        $one_client["planned_remarks"] = wordwrap($one_client["planned_remarks"], 40);
+        $one_client["planned_route"] = wordwrap($one_client["planned_route"], 40);
+        if (isset($one_client["atis_message"])) $one_client["atis_message"] = wordwrap($one_client["atis_message"], 40);
 
-    foreach ($clients as $item)
-    {
-        $cl_array = explode(":", trim($item));
-        fixArrayEncoding($cl_array);
-        $combined = @array_combine($tpl_array, $cl_array);
-        if (!$combined)
-        {
-            $combined = @array_combine($tpl_array_without_atis, $cl_array);
-        }
-        if (!$combined || !is_array($combined) || empty($combined))
-        {
-            error_log("array_combine error");
-            continue;
-        }
-        if ($combined && is_array($combined))
-        {
-            $combined["planned_remarks"] = wordwrap($combined["planned_remarks"], 40);
-            $combined["planned_route"] = wordwrap($combined["planned_route"], 40);
-            if (isset($combined["atis_message"])) $combined["atis_message"] = wordwrap($combined["atis_message"], 40);
-            $clients_final[] = $combined;
-        }
-    }
-
-    //get planned_depairport_lat, planned_depairport_lon, planned_destairport_lat, planned_destairport_lon values from the database
-    global $airports;
-    foreach ($clients_final as $k => $v)
-    {
-        if (!is_array($v))
-        {
-            error_log("not an array!");
-            continue;
-        }
         $dep = false;
         $dest = false;
-        if (array_key_exists("planned_depairport", $v) && strlen($v["planned_depairport"]) > 0)
+        global $airports;
+        if (array_key_exists("planned_depairport", $one_client) && strlen($one_client["planned_depairport"]) > 0)
         {
-            $dep = $airports->getAirportDetails($v["planned_depairport"]);
+            $dep = $airports->getAirportDetails($one_client["planned_depairport"]);
         }
-        if (array_key_exists("planned_destairport", $v) && strlen($v["planned_destairport"]) > 0)
+        if (array_key_exists("planned_destairport", $one_client) && strlen($one_client["planned_destairport"]) > 0)
         {
-            $dest = $airports->getAirportDetails($v["planned_destairport"]);
+            $dest = $airports->getAirportDetails($one_client["planned_destairport"]);
         }
         if ($dep)
         {
-            $clients_final[$k]["planned_depairport_lat"] = $dep[6];
-            $clients_final[$k]["planned_depairport_lon"] = $dep[7];
-            $clients_final[$k]["planned_depairport_name_"] = $dep[1];
-            $clients_final[$k]["planned_depairport_country_"] = $dep[3];
-            $clients_final[$k]["planned_depairport_city_"] = $dep[2];
-            $clients_final[$k]["planned_depairport_id_"] = $dep[0];
+            $one_client["planned_depairport_lat"] = $dep[6];
+            $one_client["planned_depairport_lon"] = $dep[7];
+            $one_client["planned_depairport_name_"] = $dep[1];
+            $one_client["planned_depairport_country_"] = $dep[3];
+            $one_client["planned_depairport_city_"] = $dep[2];
+            $one_client["planned_depairport_id_"] = $dep[0];
         }
         if ($dest)
         {
-            $clients_final[$k]["planned_destairport_lat"] = $dest[6];
-            $clients_final[$k]["planned_destairport_lon"] = $dest[7];
-            $clients_final[$k]["planned_destairport_name_"] = $dest[1];
-            $clients_final[$k]["planned_destairport_country_"] = $dest[3];
-            $clients_final[$k]["planned_destairport_city_"] = $dest[2];
-            $clients_final[$k]["planned_destairport_id_"] = $dest[0];
+            $one_client["planned_destairport_lat"] = $dest[6];
+            $one_client["planned_destairport_lon"] = $dest[7];
+            $one_client["planned_destairport_name_"] = $dest[1];
+            $one_client["planned_destairport_country_"] = $dest[3];
+            $one_client["planned_destairport_city_"] = $dest[2];
+            $one_client["planned_destairport_id_"] = $dest[0];
         }
-        if ($v["clienttype"] == "ATC" && ($atc_airport = $airports->getAirportDetails(strtok($v["callsign"], '_'))))
+        if ($one_client["clienttype"] == "ATC" && ($atc_airport = $airports->getAirportDetails(strtok($one_client["callsign"], '_'))))
         {
-            $clients_final[$k]["atc_airport_name_"] = $atc_airport[1];
-            $clients_final[$k]["atc_airport_country_"] = $atc_airport[3];
-            $clients_final[$k]["atc_airport_city_"] = $atc_airport[2];
-            $clients_final[$k]["atc_airport_icao_"] = $atc_airport[5];
+            $one_client["atc_airport_name_"] = $atc_airport[1];
+            $one_client["atc_airport_country_"] = $atc_airport[3];
+            $one_client["atc_airport_city_"] = $atc_airport[2];
+            $one_client["atc_airport_icao_"] = $atc_airport[5];
         }
-        $clients_final[$k]["timestamp"] = $timestamp;
-        $clients_final[$k]["network"] = STATUS_URL_TYPE;
-        $clients_final[$k]["time_logon"] = getLogonTime($clients_final[$k]["time_logon"]);
+        $one_client["timestamp"] = $timestamp;
+        $one_client["network"] = STATUS_URL_TYPE;
+        $one_client["time_logon"] = getLogonTime($one_client["time_logon"]);
+
+        fixArrayEncoding($one_client);
+        $clients_final[] = $one_client;
     }
+
     addToDB(STATUS_URL_TYPE, $clients_final, $timestamp, getUsersOnline($data));
     return true;
 }
@@ -300,6 +275,10 @@ $serversArray = array();
 if (isIvao() && defined("WHAZZUP_URL_IVAO") && !empty(WHAZZUP_URL_IVAO))
 {
     $serversArray[] = WHAZZUP_URL_IVAO;
+}
+else if (!isIvao() && defined("WHAZZUP_URL_VATSIM") && !empty(WHAZZUP_URL_VATSIM))
+{
+    $serversArray[] = WHAZZUP_URL_VATSIM;
 }
 else
 {
