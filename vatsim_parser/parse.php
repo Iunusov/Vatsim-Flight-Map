@@ -197,7 +197,7 @@ function trytoparse($url)
     {
         //error_log('old data, skip');
         return false;
-        
+
     }
 
     preg_match_all("/(.*?):" . EOL__ . "/", $clients_container[1], $clients);
@@ -297,16 +297,17 @@ function trytoparse($url)
     return true;
 }
 
-getServers();
-$serversArray = loadServersArray();
-if (isIvao())
+$serversArray = array();
+if (isIvao() && defined("WHAZZUP_URL_IVAO") && !empty(WHAZZUP_URL_IVAO))
 {
-    $serversArray[] = "https://api.ivao.aero/getdata/whazzup/whazzup.txt";
+    $serversArray[] = WHAZZUP_URL_IVAO;
 }
 else
 {
-    $serversArray[] = "http://eu.data.vatsim.net/vatsim-data.txt";
+    getServers();
+    $serversArray = loadServersArray();
 }
+
 if (count($serversArray) <= 0)
 {
     error_log("loadServersArray() fails!");

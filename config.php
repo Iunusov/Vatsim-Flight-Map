@@ -7,6 +7,9 @@ define("MEMCACHE_EXPIRY_SECONDS", 3600);
 define("STATUS_URL_IVAO", "https://www.ivao.aero/whazzup/status.txt");
 define("STATUS_URL_VATSIM", "http://status.vatsim.net/");
 
+
+define("WHAZZUP_URL_IVAO", "");  // for private servers
+
 define("CACHE_LIFETIME_SECONDS", 100);
 
 define("CLIENTS_DATA", "CLIENTS_DATA");
