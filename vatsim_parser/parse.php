@@ -176,8 +176,7 @@ function trytoparse($url)
         error_log("file_get_contents($url) fails");
         return false;
     }
-    $pattern = isIvao() ? "/!CLIENTS\n(.*?)" . EOL__ . "!AIRPORTS" . "/s" : "/!CLIENTS:(.*?)" . EOL__ . ";" . EOL__ . ";" . EOL__ . "/s";
-    preg_match($pattern, $data, $clients_container);
+    $pattern = isIvao() ? "/!CLIENTS\n(.*?)" . EOL__ . "!" . "/s" : "/!CLIENTS:(.*?)" . EOL__ . ";" . EOL__ . ";" . EOL__ . "/s";
     preg_match($pattern, $data, $clients_container);
 
     if (!isset($clients_container[1]))
@@ -195,7 +194,7 @@ function trytoparse($url)
     $timestamp_from_memcache = db\getTimestamp(STATUS_URL_TYPE);
     if ($timestamp && $timestamp_from_memcache && ($timestamp <= $timestamp_from_memcache))
     {
-        //error_log('old data, skip');
+        error_log('old data, skip');
         return false;
 
     }
