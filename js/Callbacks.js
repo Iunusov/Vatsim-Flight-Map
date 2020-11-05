@@ -16,7 +16,7 @@ var Callbacks = function () {
         }
         var defaultLocation = [parseFloat(conf['map_center_lng']) || 27.3731, parseFloat(conf['map_center_lat']) || 36.0744];
         var zoom = parseFloat(conf['map_zoom']) || 2.0244;
-        var styles = ["mapbox://styles/mapbox/outdoors-v11"/*, "mapbox://styles/mapbox/light-v10", "mapbox://styles/mapbox/navigation-preview-night-v4", "mapbox://styles/mapbox/navigation-preview-day-v4", "mapbox://styles/mapbox/satellite-v9"*/];
+        var styles = ["mapbox://styles/mapbox/outdoors-v11" /*, "mapbox://styles/mapbox/light-v10", "mapbox://styles/mapbox/navigation-preview-night-v4", "mapbox://styles/mapbox/navigation-preview-day-v4", "mapbox://styles/mapbox/satellite-v9"*/];
 
         map = new mapboxgl.Map({
             container: 'map',
@@ -32,9 +32,14 @@ var Callbacks = function () {
                     app = new App(conf, map);
                     bindHandlers(conf);
                     app.startPolling(function () {
-                        var callSign = utils.getUrlParam("c", document.URL);
-                        if (callSign) {
-                            app.searchForCallsign(callSign);
+                        if (window.location.hash) {
+                            var hash = window.location.hash.substring(1);
+                            app.searchForCallsign(hash);
+                        } else {
+                            var callSign = utils.getUrlParam("c", document.URL);
+                            if (callSign) {
+                                app.searchForCallsign(callSign);
+                            }
                         }
                     });
                 }
@@ -70,7 +75,7 @@ var Callbacks = function () {
             if (window && window.history && window.history.replaceState) {
                 var callSign = client.callsign;
                 if (callSign) {
-                    history.replaceState({}, document.title, "?c=" + callSign);
+                    history.replaceState({}, document.title, "#" + callSign);
                 }
             }
             saveParamsToLocalStorage(app, inputCallsign.val());
